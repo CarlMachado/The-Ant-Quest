@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <conio.h>
 #include <time.h>
+#include <allegro5/allegro.h>
 
 #define L 16
 #define C 32
@@ -37,19 +38,19 @@ void imprime(int m[L][C])
 			else if (m[i][j] == 9)
 				cout << (char)958;
 			else if (m[i][j] == 2)
-				cout << (char)423;
+				cout << "1";
 			else if (m[i][j] == 3)
-				cout << (char)975;
+				cout << "2";
 			else if (m[i][j] == 4)
-				cout << "A";
+				cout << "3";
 			else if (m[i][j] == 5)
-				cout << "A";
+				cout << "4";
 		}
 		cout << "\n";
 	}
 }
 
-void move_formiga(int m[L][C])
+void comandos(int m[L][C], bool &sair)
 {
 	static int x = 1, y = 1;
 	char p;
@@ -92,26 +93,28 @@ void move_formiga(int m[L][C])
 				m[x][y] = 9;
 			}
 			break;
+		case 'q':
+			sair = true;
 		}
 	}
 }
 
-void atualizar_mapa(int mapa1[L][C], int mapa2[L][C], int mapa3[L][C], int mapa)
+void atualizar_mapa(int mapa1[L][C], int mapa2[L][C], int mapa3[L][C], int mapa, bool &sair)
 {
 	if (mapa == 1)
 	{
 		imprime(mapa1);
-		move_formiga(mapa1);
+		comandos(mapa1, sair);
 	}
 	else if (mapa == 2)
 	{
 		imprime(mapa2);
-		move_formiga(mapa2);
+		comandos(mapa2, sair);
 	}
 	else if (mapa == 3)
 	{
 		imprime(mapa3);
-		move_formiga(mapa3);
+		comandos(mapa3, sair);
 	}
 }
 
@@ -133,46 +136,45 @@ void medir_tempo(int a, int &mapa)
 		{
 			srand(time(NULL));
 			mapa = 1 + (rand() % 2);
-			tempo_total = 0;
-		}
-	}
-}
-
-void ler_matriz(int mapa1[L][C], int mapa2[L][C], int mapa3[L][C])
-{
-	ifstream arquivoMapa[3];
-	int i, j;
-
-	arquivoMapa[0].open("mapa1.txt");
-	//arquivoMapa[1].open("mapa2.txt");
-	//arquivoMapa[2].open("mapa3.txt");
-
-	for (i = 0; i < L; i++)
-	{
-		for (j = 0; j < C; j++)
-		{
-			arquivoMapa[0] >> mapa1[L][C];
-			//arquivoMapa[1] >> mapa2[L][C];
-			//arquivoMapa[2] >> mapa3[L][C];
+			tempo_total = 0.0;
 		}
 	}
 }
 
 int main()
 {
-	int mapa1[L][C], mapa2[L][C], mapa3[L][C];
+	int mapa1[L][C] =
+	{
+		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+		{1,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1},
+		{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1},
+		{1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,1,1,0,0,1},
+		{1,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1},
+		{1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,1,0,0,0,0,0,0,1,0,1,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1},
+		{1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,1,0,0,0,0,0,0,1},
+		{1,0,1,0,1,0,0,0,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,0,1},
+		{1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,1,1,1,0,0,0,1,0,1,1,1,1,0,1},
+		{1,0,1,0,1,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,1,0,1,0,1,0,1,0,0,0,0,1},
+		{1,0,1,0,0,0,0,0,0,0,0,0,1,1,5,1,1,0,1,0,0,0,1,0,0,0,1,0,1,1,1,1},
+		{1,0,1,1,1,1,1,1,1,1,1,0,1,1,0,0,0,0,1,0,1,1,1,1,1,1,1,0,1,1,1,1},
+		{1,0,0,0,0,0,0,0,0,0,0,3,1,1,1,0,1,1,1,0,0,0,0,0,0,4,1,0,0,0,0,1},
+		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	};
+	int mapa2[L][C];
+	int mapa3[L][C];
 	int mapa = 1;
-
-	ler_matriz(mapa1, mapa2, mapa3);
+	bool sair = false;
 
 	hidecursor();
 
-	while (true)
+	while (!sair)
 	{
-		medir_tempo(0, mapa);
-		atualizar_mapa(mapa1, mapa2, mapa3, mapa);
+		//medir_tempo(0, mapa);
+		atualizar_mapa(mapa1, mapa2, mapa3, mapa, sair);
 		mgotoxy(0, 0);
-		medir_tempo(1, mapa);
+		//medir_tempo(1, mapa);
 	}
 	return 0;
 }
