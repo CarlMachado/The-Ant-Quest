@@ -55,8 +55,49 @@ void imprime(int m[L][C], int comida)
 	if (comida == 0)
 		cout << "Comida atual: nenhum";
 	else
-		cout << "Comida atual: " << comida;
+		cout << "Comida atual: " << comida << "           "; 
+	/* 
+	CAIO, neste simples caso eu coloquei espaçoes depois 
+	da variável pois o programa não limpa a tela, mas sim 
+	sobrepõe os caracteres anteriores, então quando o valor 
+	da comida mudava, ficava sobrando uma parte do nenhum.
+	*/
 	/*------------------------------------*/
+}
+
+// DESCRIÇÃO
+void preencherMapas(int m1[L][C], int m2[L][C], int m3[L][C])
+{
+	int mapa1[L][C] =
+	{
+		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
+		{ 1,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,8,1 },
+		{ 1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,5,1 },
+		{ 1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,0,1 },
+		{ 1,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1 },
+		{ 1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,7,1,0,1,1,1,1,1,1,1,1,1,0,1 },
+		{ 1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,0,0,5,1,0,0,0,0,0,0,0,0,0,0,0,1 },
+		{ 1,0,1,0,0,0,0,0,0,1,0,1,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1 },
+		{ 1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,0,0,0,0,1,0,0,0,0,0,0,1 },
+		{ 1,0,1,0,1,0,0,0,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,0,1 },
+		{ 1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,1,1,1,0,0,0,1,0,1,1,1,1,0,1 },
+		{ 1,0,1,0,1,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,1,0,1,0,1,0,1,0,0,0,0,1 },
+		{ 1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,1,0,0,0,1,0,0,0,1,0,1,1,1,1 },
+		{ 1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,1,1,1 },
+		{ 1,6,5,0,1,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,1 },
+		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }
+	};
+	int mapa2[L][C];
+	int mapa3[L][C];
+
+	for (int i = 0; i < L; i++)
+	{
+		for (int j = 0; j < C; j++)
+		{
+			m1[i][j] = mapa1[i][j];
+		}
+
+	}
 }
 //
 // FIM DA PARTE DE CÓDIGO ESCRITA POR CAIO
@@ -65,39 +106,7 @@ void imprime(int m[L][C], int comida)
 
 // PARTE DO CÓDIGO ESCRITA POR CARLOS
 //
-// Nessa função verifica-se o armazem
-void verificarArmazem(int &comida, int &local, int m[L][C], int x, int y, bool &vazio)
-{
-	int i;
-	if (comida == 0)
-	{
-		for (i = 3; i >= 0; i++)
-		{
-			if (local != 0)
-			{
-				comida = local;
-				local = 0;
-				m[x][y] = 10;
-				vazio = false;
-			}
-		}
-	}
-	else
-	{
-		for (i = 0; i < 4; i++)
-		{
-			if (local == 0)
-			{
-				local = comida;
-				comida = 0;
-				m[x][y] = 9;
-				vazio = true;
-			}
-		}
-	}
-}
-
-// Essa função verifica se a formiga está ou não com comida
+// Verifica se a formiga está ou não com comida
 void formigaAtual(int m[L][C], int x, int y, bool vazio)
 {
 	if (vazio)
@@ -106,8 +115,51 @@ void formigaAtual(int m[L][C], int x, int y, bool vazio)
 		m[x][y] = 10;
 }
 
+// Inicializa o armazém inicial
+void iniciarArmazem(int comida[])
+{
+	int i, j = 4;
+	for (i = 0; i < 4; i++)
+	{
+		comida[i] = j;
+		j--;
+	}
+}
+
+// Nessa função verifica-se o armazem
+void verificarArmazem(int &comida, int local[], int m[L][C], int x, int y, bool &vazio)
+{
+	int i;
+	if (comida == 0)
+	{
+		for (i = 3; i >= 0; i--)
+		{
+			if (local[i] != 0)
+			{
+				comida = local[i];
+				local[i] = 0;
+				m[x][y] = 10;
+				vazio = false;
+			}
+		}
+	}
+	else
+	{
+		for (i = 0; i <= 3; i++)
+		{
+			if (local[i] == 0)
+			{
+				local[i] = comida;
+				comida = 0;
+				m[x][y] = 9;
+				vazio = true;
+			}
+		}
+	}
+}
+
 // Nessa função são executados os comandos do jogo
-void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[], bool &vazio, int comidaAtualFormiga)
+void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[], bool &vazio, int &comidaAtualFormiga)
 {
 	static int x = 1, y = 1;
 	char tecla;
@@ -150,7 +202,7 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 				formigaAtual(m, x, y, vazio);
 			}
 			break;
-		case 'q': // sair
+		case 27: // sair
 			sair = true;
 			break;
 		case 32:  // pega ou deposita comida
@@ -159,16 +211,15 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 			{
 				if (x > 12 && y < 3) // armazem 1 (inicial baixo)
 				{
-					verificarArmazem(comidaAtualFormiga, local1[0], m, x, y, vazio);
+					verificarArmazem(comidaAtualFormiga, local1, m, x, y, vazio);
 				}
-				if (x > 4 && x < 8 &&
-					y > 15 && y < 19) // armazem 2 (meio)
+				if (x > 4 && x < 8 && y > 15 && y < 19) // armazem 2 (meio)
 				{
-					verificarArmazem(comidaAtualFormiga, local1[0], m, x, y, vazio);
+					verificarArmazem(comidaAtualFormiga, local2, m, x, y, vazio);
 				}
 				if (x < 4 && y > 28) // armazem 3 (cima)
 				{
-					verificarArmazem(comidaAtualFormiga, local1[0], m, x, y, vazio);
+					verificarArmazem(comidaAtualFormiga, local3, m, x, y, vazio);
 				}
 			}
 			break;
@@ -184,7 +235,7 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 // PARTE DO CÓDIGO ESCRITA POR MATEUS
 //
 // função para medir tempo e sortear novo mapa 
-void medir_tempo(bool inicio, int &mapa)
+void medirTempo(bool inicio, int &mapa)
 {
 	static clock_t tempo_inicial = 0, tempo_final = 0;
 	static double tempo_total;
@@ -201,7 +252,7 @@ void medir_tempo(bool inicio, int &mapa)
 		if (tempo_total >= TEMPO_MAXIMO)
 		{
 			srand(time(NULL));
-			mapa = 1 + (rand() % 2);
+			mapa = rand() % 2;
 			tempo_total = 0.0;
 		}
 	}
@@ -215,13 +266,13 @@ void medir_tempo(bool inicio, int &mapa)
 /*-------------------------------- STRUCTS ------------------------------------*/
 struct Formiga
 {
-	int comida = 0;
+	int comidaAtual = 0;
 	bool vazio = true;
 };
 
 struct Mapa
 {
-	int mapa1[L][C] =
+	int m[L][C] =
 	{
 		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
 		{ 1,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,8,1 },
@@ -240,9 +291,7 @@ struct Mapa
 		{ 1,6,5,0,1,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,1 },
 		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }
 	};
-	int mapa2[L][C];
-	int mapa3[L][C];
-	int mapa = 1;
+	
 };
 
 struct Armazem
@@ -255,40 +304,25 @@ int main()
 {
 	/*-------------------------------- VARIÁVEIS ------------------------------*/
 	Formiga formiga;
-	Mapa mapa;
+	Mapa mapa[3];
 	Armazem local[3]; // cada struct do vetor local representa um armazem no jogo
+	int mapaAtual = 0;
 	bool sair = false;
 	/*-------------------------------------------------------------------------*/
 
 	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
 	hidecursor();
-	// aqui inicia o armazem inicial
-	local[0].comida[0] = 4;
-	local[0].comida[1] = 3;
-	local[0].comida[2] = 2;
-	local[0].comida[3] = 1;
+	preencherMapas(mapa[0].m, mapa[1].m, mapa[2].m);
+	iniciarArmazem(local[0].comida);
 	/*-------------------------------------------------------------------------*/
 
 	while (!sair)
 	{
-		//medir_tempo(1, mapa);
-		if (mapa.mapa == 1)
-		{
-			imprime(mapa.mapa1, formiga.comida);
-			comandos(mapa.mapa1, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio, formiga.comida);
-		}
-		else if (mapa.mapa == 2)
-		{
-			imprime(mapa.mapa2, formiga.comida);
-			comandos(mapa.mapa2, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio, formiga.comida);
-		}
-		else if (mapa.mapa == 3)
-		{
-			imprime(mapa.mapa3, formiga.comida);
-			comandos(mapa.mapa3, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio, formiga.comida);
-		}
+		//medirTempo(1, mapa);
+		imprime(mapa[mapaAtual].m, formiga.comidaAtual);
+		comandos(mapa[mapaAtual].m, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio, formiga.comidaAtual);
 		mgotoxy(0, 0);
-		//medir_tempo(0, mapa);
+		//medirTempo(0, mapa);
 	}
 	return 0;
 }
