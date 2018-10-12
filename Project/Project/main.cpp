@@ -25,7 +25,7 @@ void mgotoxy(int x, int y)
 // PARTE DO CÓDIGO ESCRITA POR CAIO
 //
 //Nessa função a matriz é percorrida e os números são substituidos
-void imprime(int m[L][C], int comida)
+void imprime(int m[L][C], int comida, int a1[], int a2[], int a3[])
 {
 	for (int i = 0; i < L; i++)
 	{
@@ -53,14 +53,20 @@ void imprime(int m[L][C], int comida)
 	/*-------------- HUD -----------------*/
 	cout << endl << endl;
 	if (comida == 0)
-		cout << "Comida atual: nenhum";
+		cout << "Comida atual: nenhum\n\n";
 	else
-		cout << "Comida atual: " << comida << "           "; 
+		cout << "Comida atual: " << comida << "           \n\n"; 
+	cout << "Armazem 1 (BAIXO):\nP1: " << a1[0] << " | P2: " << a1[1] << " | P3: " << a1[2] << " | P4: " << a1[3] << endl << endl;
+	cout << "Armazem 2  (MEIO):\nP1: " << a2[0] << " | P2: " << a2[1] << " | P3: " << a2[2] << " | P4: " << a2[3] << endl << endl;
+	cout << "Armazem 3  (CIMA):\nP1: " << a3[0] << " | P2: " << a3[1] << " | P3: " << a3[2] << " | P4: " << a3[3] << endl << endl;
 	/* 
 	CAIO, neste simples caso eu coloquei espaçoes depois 
 	da variável pois o programa não limpa a tela, mas sim 
 	sobrepõe os caracteres anteriores, então quando o valor 
 	da comida mudava, ficava sobrando uma parte do nenhum.
+
+	O armazém está sem acento pois quando fui implementar
+	o setlocale, bugou o caractere responsável pelo mapa.
 	*/
 	/*------------------------------------*/
 }
@@ -80,7 +86,7 @@ void preencherMapas(int m1[L][C], int m2[L][C], int m3[L][C])
 		{ 1,0,1,0,0,0,0,0,0,1,0,1,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1 },
 		{ 1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,0,0,0,0,1,0,0,0,0,0,0,1 },
 		{ 1,0,1,0,1,0,0,0,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,0,1 },
-		{ 1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,1,1,1,0,0,0,1,0,1,1,1,1,0,1 },
+		{ 1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,1,0,0,0,0,0,1,0,1,0,1,1,0,1 },
 		{ 1,0,1,0,1,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,1,0,1,0,1,0,1,0,0,0,0,1 },
 		{ 1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,1,0,0,0,1,0,0,0,1,0,1,1,1,1 },
 		{ 1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,1,1,1 },
@@ -102,7 +108,15 @@ void preencherMapas(int m1[L][C], int m2[L][C], int m3[L][C])
 //
 // FIM DA PARTE DE CÓDIGO ESCRITA POR CAIO
 
+
+
+
+
 /*---------------------------------------------------------------------------------------------------*/
+
+
+
+
 
 // PARTE DO CÓDIGO ESCRITA POR CARLOS
 //
@@ -126,7 +140,7 @@ void iniciarArmazem(int comida[])
 	}
 }
 
-// Nessa função verifica-se o armazem
+// Nessa função verifica-se se vai retirar ou colocar a comida no armazém
 void verificarArmazem(int &comida, int local[], int m[L][C], int x, int y, bool &vazio)
 {
 	int i;
@@ -149,10 +163,20 @@ void verificarArmazem(int &comida, int local[], int m[L][C], int x, int y, bool 
 		{
 			if (local[i] == 0)
 			{
-				local[i] = comida;
-				comida = 0;
-				m[x][y] = 9;
-				vazio = true;
+				if (i == 0)
+				{
+					local[i] = comida;
+					comida = 0;
+					m[x][y] = 9;
+					vazio = true;
+				}
+				else if (comida < local[i-1])
+				{
+					local[i] = comida;
+					comida = 0;
+					m[x][y] = 9;
+					vazio = true;
+				}
 			}
 		}
 	}
@@ -230,7 +254,15 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 //
 // FIM DA PARTE DE CÓDIGO ESCRITA POR CARLOS
 
+
+
+
+
 /*---------------------------------------------------------------------------------------------------*/
+
+
+
+
 
 // PARTE DO CÓDIGO ESCRITA POR MATEUS
 //
@@ -259,6 +291,10 @@ void medirTempo(bool inicio, int &mapa)
 }
 //
 // FIM DA PARTE DE CÓDIGO ESCRITA POR MATEUS
+
+
+
+
 
 // TANTO A FUNÇÃO MAIN COMO SUAS VARIÁVEIS FORAM MANIPULADAS POR TODO O GRUPO
 //
@@ -314,15 +350,16 @@ int main()
 	hidecursor();
 	preencherMapas(mapa[0].m, mapa[1].m, mapa[2].m);
 	iniciarArmazem(local[0].comida);
+	//setlocale(LC_ALL, "Portuguese"); AO TENTAR USAR O SETLOCALE BUGOU TODOS OS CARACTERES DO MAPA
 	/*-------------------------------------------------------------------------*/
 
 	while (!sair)
 	{
-		//medirTempo(1, mapa);
-		imprime(mapa[mapaAtual].m, formiga.comidaAtual);
+		//medirTempo(true, mapaAtual);
+		imprime(mapa[mapaAtual].m, formiga.comidaAtual, local[0].comida, local[1].comida, local[2].comida);
 		comandos(mapa[mapaAtual].m, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio, formiga.comidaAtual);
 		mgotoxy(0, 0);
-		//medirTempo(0, mapa);
+		//medirTempo(false, mapaAtual);
 	}
 	return 0;
 }
