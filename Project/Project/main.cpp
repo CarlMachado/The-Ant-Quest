@@ -22,6 +22,8 @@ void mgotoxy(int x, int y)
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), COORD{ static_cast<short>(x), static_cast<short>(y) });
 }
 
+// PARTE DO CÓDIGO ESCRITA POR CAIO
+//
 //Nessa função a matriz é percorrida e os números são substituidos
 void imprime(int m[L][C], int comida)
 {
@@ -54,29 +56,70 @@ void imprime(int m[L][C], int comida)
 	else
 		cout << "Comida atual: " << comida;
 }
+//
+// FIM DA PARTE DE CÓDIGO ESCRITA POR CAIO
 
+// PARTE DO CÓDIGO ESCRITA POR CARLOS
+//
+// Nessa função verifica-se o armazem
+void verificarArmazem(int &comida, int &local, int m[L][C], int x, int y, bool &vazio)
+{
+	int i;
+	if (comida == 0)
+	{
+		for (i = 3; i >= 0; i++)
+		{
+			if (local != 0)
+			{
+				comida = local;
+				local = 0;
+				m[x][y] = 10;
+				vazio = false;
+			}
+		}
+	}
+	else
+	{
+		for (i = 0; i < 4; i++)
+		{
+			if (local == 0)
+			{
+				local = comida;
+				comida = 0;
+				m[x][y] = 9;
+				vazio = true;
+			}
+		}
+	}
+}
+
+// Essa função // verifica se a formiga está ou não com comida
+void formigaAtual(int m[L][C], int x, int y, bool vazio)
+{
+	if (vazio)
+		m[x][y] = 9;
+	else
+		m[x][y] = 10;
+}
 
 // Nessa função são executados os comandos do jogo
 void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[], bool &vazio, int comidaAtualFormiga)
 {
 	static int x = 1, y = 1;
-	char p;
+	char tecla;
 
 	if (_kbhit())
 	{
-		p = _getch();
+		tecla = _getch();
 
-		switch (p)
+		switch (tecla)
 		{
 		case 'w': //cima
 			if (m[x - 1][y] == 0)
 			{
 				m[x][y] = 0;
 				x--;
-				if (vazio) // verifica se a formiga está ou não com comida
-					m[x][y] = 9;
-				else
-					m[x][y] = 10;
+				formigaAtual(m, x, y, vazio);
 			}
 			break;
 		case 's': //baixo
@@ -84,10 +127,7 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 			{
 				m[x][y] = 0;
 				x++;
-				if (vazio)
-					m[x][y] = 9;
-				else
-					m[x][y] = 10;
+				formigaAtual(m, x, y, vazio);
 			}
 			break;
 		case 'a': //esquerda
@@ -95,10 +135,7 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 			{
 				m[x][y] = 0;
 				y--;
-				if (vazio)
-					m[x][y] = 9;
-				else
-					m[x][y] = 10;
+				formigaAtual(m, x, y, vazio);
 			}
 			break;
 		case 'd': //direita
@@ -106,34 +143,29 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 			{
 				m[x][y] = 0;
 				y++;
-				if (vazio)
-					m[x][y] = 9;
-				else
-					m[x][y] = 10;
+				formigaAtual(m, x, y, vazio);
 			}
 			break;
 		case 'q': // sair
 			sair = true;
 			break;
 		case 32:  // pega ou deposita comida
-			// se alguma posição ao redor da formiga for comida ele pega
+			// se alguma posição ao redor da formiga for comida ela pega
 			if (m[x + 1][y] == 5 || m[x - 1][y] == 5 ||
 				m[x][y + 1] == 5 || m[x][y - 1] == 5   )
 			{
-				//m[x][y] = 10;
-				//vazio = false;
 				if (x > 12 && y < 3) // armazem 1 (inicial baixo)
 				{
-
+					verificarArmazem(comidaAtualFormiga, local1[0], m, x, y, vazio);
 				}
 				if (x > 4 && x < 8 &&
 					y > 15 && y < 19) // armazem 2 (meio)
 				{
-
+					verificarArmazem(comidaAtualFormiga, local1[0], m, x, y, vazio);
 				}
 				if (x < 4 && y > 28) // armazem 3 (cima)
 				{
-
+					verificarArmazem(comidaAtualFormiga, local1[0], m, x, y, vazio);
 				}
 			}
 			break;
@@ -141,7 +173,11 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 		Sleep(100);
 	}
 }
+//
+// FIM DA PARTE DE CÓDIGO ESCRITA POR CARLOS
 
+// PARTE DO CÓDIGO ESCRITA POR MATEUS
+//
 // função para medir tempo e sortear novo mapa 
 void medir_tempo(bool inicio, int &mapa)
 {
@@ -165,7 +201,11 @@ void medir_tempo(bool inicio, int &mapa)
 		}
 	}
 }
+//
+// FIM DA PARTE DE CÓDIGO ESCRITA POR MATEUS
 
+// TANTO A FUNÇÃO MAIN COMO SUAS VARIÁVEIS FORAM MANIPULADAS POR TODO O GRUPO
+//
 struct Formiga
 {
 	int comida = 0;
@@ -178,11 +218,11 @@ struct Mapa
 	{
 		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
 		{ 1,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,8,1 },
-		{ 1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,2,1 },
+		{ 1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,5,1 },
 		{ 1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,0,1 },
 		{ 1,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1 },
 		{ 1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,7,1,0,1,1,1,1,1,1,1,1,1,0,1 },
-		{ 1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,1 },
+		{ 1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,0,0,5,1,0,0,0,0,0,0,0,0,0,0,0,1 },
 		{ 1,0,1,0,0,0,0,0,0,1,0,1,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1 },
 		{ 1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,0,0,0,0,1,0,0,0,0,0,0,1 },
 		{ 1,0,1,0,1,0,0,0,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,0,1 },
@@ -241,3 +281,5 @@ int main()
 	}
 	return 0;
 }
+//
+//
