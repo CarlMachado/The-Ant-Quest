@@ -23,7 +23,7 @@ void mgotoxy(int x, int y)
 }
 
 //Nessa função a matriz é percorrida e os números são substituidos
-void imprime(int m[L][C])
+void imprime(int m[L][C], int comida)
 {
 	for (int i = 0; i < L; i++)
 	{
@@ -33,22 +33,31 @@ void imprime(int m[L][C])
 				cout << (char)178;
 			else if (m[i][j] == 0)
 				cout << " ";
-			else if (m[i][j] == 9)
-				cout << (char)958;
 			else if (m[i][j] == 2)
+				cout << " ";
+			else if (m[i][j] == 9)
+				cout << (char)667;
+			else if (m[i][j] == 10)
+				cout << "O";
+			else if (m[i][j] == 6)
 				cout << "1";
-			else if (m[i][j] == 3)
+			else if (m[i][j] == 7)
 				cout << "2";
-			else if (m[i][j] == 4)
+			else if (m[i][j] == 8)
 				cout << "3";
 			else if (m[i][j] == 5)
-				cout << "4";
+				cout << (char)254;
 		}
-		cout << "\n";
+		cout << endl;
 	}
+	cout << endl << endl;
+	if (comida == 0)
+		cout << "Comida atual: nenhum";
+	else
+		cout << "Comida atual: " << comida;
 }
 
-void comandos(int m[L][C], bool &sair)
+void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[], bool &vazio)
 {
 	static int x = 1, y = 1;
 	char p;
@@ -64,7 +73,10 @@ void comandos(int m[L][C], bool &sair)
 			{
 				m[x][y] = 0;
 				x--;
-				m[x][y] = 9;
+				if (vazio)
+					m[x][y] = 9;
+				else
+					m[x][y] = 10;
 			}
 			break;
 		case 's': //baixo
@@ -72,7 +84,10 @@ void comandos(int m[L][C], bool &sair)
 			{
 				m[x][y] = 0;
 				x++;
-				m[x][y] = 9;
+				if (vazio)
+					m[x][y] = 9;
+				else
+					m[x][y] = 10;
 			}
 			break;
 		case 'a': //esquerda
@@ -80,7 +95,10 @@ void comandos(int m[L][C], bool &sair)
 			{
 				m[x][y] = 0;
 				y--;
-				m[x][y] = 9;
+				if (vazio)
+					m[x][y] = 9;
+				else
+					m[x][y] = 10;
 			}
 			break;
 		case 'd': //direita
@@ -88,20 +106,39 @@ void comandos(int m[L][C], bool &sair)
 			{
 				m[x][y] = 0;
 				y++;
-				m[x][y] = 9;
+				if (vazio)
+					m[x][y] = 9;
+				else
+					m[x][y] = 10;
 			}
 			break;
 		case 'q': // sair
 			sair = true;
 			break;
+		case 32:
+			if (m[x + 1][y] == 5 || m[x - 1][y] == 5 ||
+				m[x][y + 1] == 5 || m[x][y - 1] == 5)
+			{
+				m[x][y] = 10;
+				vazio = false;
+				if (true)
+				{
+
+				}
+			}
+			if (m[x + 1][y] == 2 || m[x - 1][y] == 2 ||
+				m[x][y + 1] == 2 || m[x][y - 1] == 2)
+			{
+				m[x][y] = 9;
+				vazio = true;
+
+			}
+			break;
 		}
+		Sleep(100);
 	}
 }
 
-void atualizar_mapa(int mapa1[L][C], int mapa2[L][C], int mapa3[L][C], int mapa, bool &sair)
-{
-	
-}
 // função para medir tempo e sortear novo mapa
 void medir_tempo(bool inicio, int &mapa)
 {
@@ -126,51 +163,74 @@ void medir_tempo(bool inicio, int &mapa)
 	}
 }
 
-int main()
+struct Formiga
+{
+	int comida = 0;
+	bool vazio = true;
+};
+
+struct Mapa
 {
 	int mapa1[L][C] =
 	{
-		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-		{1,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1},
-		{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,0,0,0,1},
-		{1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,1,1,1,0,1},
-		{1,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1},
-		{1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},
-		{1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,1,0,0,0,0,0,0,1,0,1,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1},
-		{1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,0,1,0,1,0,0,0,0,1,0,0,0,0,0,0,1},
-		{1,0,1,0,1,0,0,0,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,0,1},
-		{1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,1,1,1,0,0,0,1,0,1,1,1,1,0,1},
-		{1,0,1,0,1,1,1,1,1,1,1,0,0,1,0,1,0,5,1,1,1,0,1,0,1,0,1,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,1,0,0,0,1,0,0,0,1,0,1,1,1,1},
-		{1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,0,0,0,1,0,1,1,1,1,1,1,1,0,1,1,1,1},
-		{1,0,0,0,1,0,0,0,0,0,0,3,1,1,1,0,1,1,1,0,0,0,0,0,0,4,1,0,0,0,0,1},
-		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
+		{ 1,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,8,1 },
+		{ 1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,2,1 },
+		{ 1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,0,1 },
+		{ 1,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1 },
+		{ 1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,7,1,0,1,1,1,1,1,1,1,1,1,0,1 },
+		{ 1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,1 },
+		{ 1,0,1,0,0,0,0,0,0,1,0,1,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1 },
+		{ 1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,0,0,0,0,1,0,0,0,0,0,0,1 },
+		{ 1,0,1,0,1,0,0,0,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,0,1 },
+		{ 1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,1,1,1,0,0,0,1,0,1,1,1,1,0,1 },
+		{ 1,0,1,0,1,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,1,0,1,0,1,0,1,0,0,0,0,1 },
+		{ 1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,1,0,0,0,1,0,0,0,1,0,1,1,1,1 },
+		{ 1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,1,1,1 },
+		{ 1,6,5,0,1,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,1 },
+		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }
 	};
 	int mapa2[L][C];
 	int mapa3[L][C];
 	int mapa = 1;
+};
+
+struct Armazem
+{
+	int comida[4] = { 0, 0, 0, 0 };
+};
+
+int main()
+{
+	Formiga formiga;
+	Mapa mapa;
+	Armazem local[3];
 	bool sair = false;
 
 	hidecursor();
 
+	local[0].comida[0] = 4;
+	local[0].comida[1] = 3;
+	local[0].comida[2] = 2;
+	local[0].comida[3] = 1;
+
 	while (!sair)
 	{
 		//medir_tempo(1, mapa);
-		if (mapa == 1)
+		if (mapa.mapa == 1)
 		{
-			imprime(mapa1);
-			comandos(mapa1, sair);
+			imprime(mapa.mapa1, formiga.comida);
+			comandos(mapa.mapa1, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio);
 		}
-		else if (mapa == 2)
+		else if (mapa.mapa == 2)
 		{
-			imprime(mapa2);
-			comandos(mapa2, sair);
+			imprime(mapa.mapa2, formiga.comida);
+			comandos(mapa.mapa2, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio);
 		}
-		else if (mapa == 3)
+		else if (mapa.mapa == 3)
 		{
-			imprime(mapa3);
-			comandos(mapa3, sair);
+			imprime(mapa.mapa3, formiga.comida);
+			comandos(mapa.mapa3, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio);
 		}
 		mgotoxy(0, 0);
 		//medir_tempo(0, mapa);
