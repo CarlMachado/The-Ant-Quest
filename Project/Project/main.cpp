@@ -33,8 +33,6 @@ void imprime(int m[L][C], int comida)
 				cout << (char)178;
 			else if (m[i][j] == 0)
 				cout << " ";
-			else if (m[i][j] == 2)
-				cout << " ";
 			else if (m[i][j] == 9)
 				cout << (char)667;
 			else if (m[i][j] == 10)
@@ -57,7 +55,9 @@ void imprime(int m[L][C], int comida)
 		cout << "Comida atual: " << comida;
 }
 
-void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[], bool &vazio)
+
+// Nessa função são executados os comandos do jogo
+void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[], bool &vazio, int comidaAtualFormiga)
 {
 	static int x = 1, y = 1;
 	char p;
@@ -73,7 +73,7 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 			{
 				m[x][y] = 0;
 				x--;
-				if (vazio)
+				if (vazio) // verifica se a formiga está ou não com comida
 					m[x][y] = 9;
 				else
 					m[x][y] = 10;
@@ -115,23 +115,24 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 		case 'q': // sair
 			sair = true;
 			break;
-		case 32:
+		case 32:  // pega ou deposita comida
 			if (m[x + 1][y] == 5 || m[x - 1][y] == 5 ||
-				m[x][y + 1] == 5 || m[x][y - 1] == 5)
+				m[x][y + 1] == 5 || m[x][y - 1] == 5) // se alguma posição ao redor da formiga for comida ele pegha
 			{
-				m[x][y] = 10;
-				vazio = false;
-				if (true)
+				//m[x][y] = 10;
+				//vazio = false;
+				if (x > 12 && y < 3) // armazem 1 (inicial baixo)
 				{
 
 				}
-			}
-			if (m[x + 1][y] == 2 || m[x - 1][y] == 2 ||
-				m[x][y + 1] == 2 || m[x][y - 1] == 2)
-			{
-				m[x][y] = 9;
-				vazio = true;
+				if (x > 12 && y < 3) // armazem 2 (meio)
+				{
 
+				}
+				if (x > 12 && y < 3) // armazem 3 (cima)
+				{
+
+				}
 			}
 			break;
 		}
@@ -204,11 +205,12 @@ int main()
 {
 	Formiga formiga;
 	Mapa mapa;
+	// cada struct do vetor Armazem representa um armazem no jogo
 	Armazem local[3];
 	bool sair = false;
 
 	hidecursor();
-
+	// aqui inicia o armazem inicial
 	local[0].comida[0] = 4;
 	local[0].comida[1] = 3;
 	local[0].comida[2] = 2;
@@ -220,17 +222,17 @@ int main()
 		if (mapa.mapa == 1)
 		{
 			imprime(mapa.mapa1, formiga.comida);
-			comandos(mapa.mapa1, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio);
+			comandos(mapa.mapa1, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio, formiga.comida);
 		}
 		else if (mapa.mapa == 2)
 		{
 			imprime(mapa.mapa2, formiga.comida);
-			comandos(mapa.mapa2, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio);
+			comandos(mapa.mapa2, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio, formiga.comida);
 		}
 		else if (mapa.mapa == 3)
 		{
 			imprime(mapa.mapa3, formiga.comida);
-			comandos(mapa.mapa3, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio);
+			comandos(mapa.mapa3, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio, formiga.comida);
 		}
 		mgotoxy(0, 0);
 		//medir_tempo(0, mapa);
