@@ -60,14 +60,16 @@ void imprime(int m[L][C], int comida, int a1[], int a2[], int a3[])
 	Neste simples caso eu coloquei espaçoes depois 
 	da variável pois o programa não limpa a tela, mas sim 
 	sobrepõe os caracteres anteriores, então quando o valor 
-	da comida mudava, ficava sobrando uma parte do nenhum.
+	da comida mudava, ficava sobrando uma parte do nenhum
+	(CARLOS).
 	*/
 	cout << "Armazem 1 (BAIXO):\nP1: " << a1[0] << " | P2: " << a1[1] << " | P3: " << a1[2] << " | P4: " << a1[3] << endl << endl;
 	cout << "Armazem 2  (MEIO):\nP1: " << a2[0] << " | P2: " << a2[1] << " | P3: " << a2[2] << " | P4: " << a2[3] << endl << endl;
 	cout << "Armazem 3  (CIMA):\nP1: " << a3[0] << " | P2: " << a3[1] << " | P3: " << a3[2] << " | P4: " << a3[3] << endl << endl;
 	/* 
 	O armazém está sem acento pois quando fui implementar
-	o setlocale, bugou os caracteres responsáveis pelo mapa.
+	o setlocale, bugou os caracteres responsáveis pelo mapa
+	(CARLOS).
 	*/
 	/*------------------------------------*/
 }
@@ -273,6 +275,11 @@ void medirTempo(bool inicio, int &mapa)
 	static double tempo_total;
 	const double TEMPO_MAXIMO = 120000.0;
 
+	/*
+	Não cheguei nem a testar esse código, não sei se a cada
+	chamada do código pode ter aquela inicialização em 0 das
+	variáveis (CARLOS).
+	*/
 	if (inicio)
 	{
 		tempo_inicial = clock();
@@ -308,31 +315,12 @@ struct Formiga
 
 struct Mapa
 {
-	int m[L][C] =
-	{
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
-		{ 1,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,8,1 },
-		{ 1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,5,1 },
-		{ 1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,0,1 },
-		{ 1,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1 },
-		{ 1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,7,1,0,1,1,1,1,1,1,1,1,1,0,1 },
-		{ 1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,0,0,5,1,0,0,0,0,0,0,0,0,0,0,0,1 },
-		{ 1,0,1,0,0,0,0,0,0,1,0,1,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1 },
-		{ 1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,0,0,0,0,1,0,0,0,0,0,0,1 },
-		{ 1,0,1,0,1,0,0,0,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,0,1 },
-		{ 1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,1,1,1,0,0,0,1,0,1,1,1,1,0,1 },
-		{ 1,0,1,0,1,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,1,0,1,0,1,0,1,0,0,0,0,1 },
-		{ 1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,1,0,0,0,1,0,0,0,1,0,1,1,1,1 },
-		{ 1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,1,1,1 },
-		{ 1,6,5,0,1,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,1 },
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }
-	};
-	
+	int m[L][C];
 };
 
 struct Armazem
 {
-	int comida[4] = { 0, 0, 0, 0 };
+	int comida[4] = {0, 0, 0, 0};
 };
 /*-----------------------------------------------------------------------------*/
 
