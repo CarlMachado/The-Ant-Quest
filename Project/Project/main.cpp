@@ -8,7 +8,7 @@
 
 using namespace std;
 
-void hidecursor()
+void escondercursor()
 {
 	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO info;
@@ -24,8 +24,8 @@ void mgotoxy(int x, int y)
 
 // PARTE DO CÓDIGO ESCRITA POR CAIO
 //
-//Nessa função a matriz é percorrida e os números são substituidos
-void imprime(int m[L][C], int comida, int a1[], int a2[], int a3[])
+// Nessa função a matriz é percorrida e os números são substituidos
+void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[])
 {
 	for (int i = 0; i < L; i++)
 	{
@@ -74,8 +74,8 @@ void imprime(int m[L][C], int comida, int a1[], int a2[], int a3[])
 	/*------------------------------------*/
 }
 
-// DESCRIÇÃO
-void preencherMapas(int m1[L][C], int m2[L][C], int m3[L][C])
+// Respon~sável por preencher as matrizes
+void preenchermapas(int m1[L][C], int m2[L][C], int m3[L][C])
 {
 	int mapa1[L][C] =
 	{
@@ -124,7 +124,7 @@ void preencherMapas(int m1[L][C], int m2[L][C], int m3[L][C])
 // PARTE DO CÓDIGO ESCRITA POR CARLOS
 //
 // Verifica se a formiga está ou não com comida
-void formigaAtual(int m[L][C], int x, int y, bool vazio)
+void formigaatual(int m[L][C], int x, int y, bool vazio)
 {
 	if (vazio)
 		m[x][y] = 9;
@@ -133,7 +133,7 @@ void formigaAtual(int m[L][C], int x, int y, bool vazio)
 }
 
 // Inicializa o armazém inicial
-void iniciarArmazem(int comida[])
+void iniciararmazem(int comida[])
 {
 	int i, j = 4;
 	for (i = 0; i < 4; i++)
@@ -144,7 +144,7 @@ void iniciarArmazem(int comida[])
 }
 
 // Nessa função verifica-se se vai retirar ou colocar a comida no armazém
-void verificarArmazem(int &comida, int local[], int m[L][C], int x, int y, bool &vazio)
+void verificararmazem(int &comida, int local[], int m[L][C], int x, int y, bool &vazio)
 {
 	int i;
 	bool s = false;
@@ -185,7 +185,7 @@ void verificarArmazem(int &comida, int local[], int m[L][C], int x, int y, bool 
 }
 
 // Nessa função são executados os comandos do jogo
-void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[], bool &vazio, int &comidaAtualFormiga)
+void lercomandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[], bool &vazio, int &comidaatualformiga)
 {
 	static int x = 1, y = 1;
 	char tecla;
@@ -201,7 +201,7 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 			{
 				m[x][y] = 0;
 				x--;
-				formigaAtual(m, x, y, vazio);
+				formigaatual(m, x, y, vazio);
 			}
 			break;
 		case 's': //baixo
@@ -209,7 +209,7 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 			{
 				m[x][y] = 0;
 				x++;
-				formigaAtual(m, x, y, vazio);
+				formigaatual(m, x, y, vazio);
 			}
 			break;
 		case 'a': //esquerda
@@ -217,7 +217,7 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 			{
 				m[x][y] = 0;
 				y--;
-				formigaAtual(m, x, y, vazio);
+				formigaatual(m, x, y, vazio);
 			}
 			break;
 		case 'd': //direita
@@ -225,7 +225,7 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 			{
 				m[x][y] = 0;
 				y++;
-				formigaAtual(m, x, y, vazio);
+				formigaatual(m, x, y, vazio);
 			}
 			break;
 		case 27: // sair
@@ -237,15 +237,15 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 			{
 				if (x > 12 && y < 3) // armazem 1 (inicial baixo)
 				{
-					verificarArmazem(comidaAtualFormiga, local1, m, x, y, vazio);
+					verificararmazem(comidaatualformiga, local1, m, x, y, vazio);
 				}
 				if (x > 4 && x < 8 && y > 15 && y < 19) // armazem 2 (meio)
 				{
-					verificarArmazem(comidaAtualFormiga, local2, m, x, y, vazio);
+					verificararmazem(comidaatualformiga, local2, m, x, y, vazio);
 				}
 				if (x < 4 && y > 28) // armazem 3 (cima)
 				{
-					verificarArmazem(comidaAtualFormiga, local3, m, x, y, vazio);
+					verificararmazem(comidaatualformiga, local3, m, x, y, vazio);
 				}
 			}
 			break;
@@ -269,7 +269,7 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 // PARTE DO CÓDIGO ESCRITA POR MATEUS
 //
 // função para medir tempo e sortear novo mapa 
-void medirTempo(bool inicio, int &mapa)
+void medirtempo(bool inicio, int &mapa)
 {
 	static clock_t tempo_inicial = 0, tempo_final = 0;
 	static double tempo_total;
@@ -330,24 +330,24 @@ int main()
 	Formiga formiga;
 	Mapa mapa[3];
 	Armazem local[3]; // cada struct do vetor local representa um armazem no jogo
-	int mapaAtual = 0;
+	int mapaatual = 0;
 	bool sair = false;
 	/*-------------------------------------------------------------------------*/
 
 	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
-	hidecursor();
-	preencherMapas(mapa[0].m, mapa[1].m, mapa[2].m);
-	iniciarArmazem(local[0].comida);
+	escondercursor();
+	preenchermapas(mapa[0].m, mapa[1].m, mapa[2].m);
+	iniciararmazem(local[0].comida);
 	//setlocale(LC_ALL, "Portuguese"); AO TENTAR USAR O SETLOCALE BUGOU TODOS OS CARACTERES DO MAPA
 	/*-------------------------------------------------------------------------*/
 
 	while (!sair)
 	{
-		//medirTempo(true, mapaAtual);
-		imprime(mapa[mapaAtual].m, formiga.comidaAtual, local[0].comida, local[1].comida, local[2].comida);
-		comandos(mapa[mapaAtual].m, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio, formiga.comidaAtual);
+		//medirtempo(true, mapaAtual);
+		imprimir(mapa[mapaatual].m, formiga.comidaAtual, local[0].comida, local[1].comida, local[2].comida);
+		lercomandos(mapa[mapaatual].m, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio, formiga.comidaAtual);
 		mgotoxy(0, 0);
-		//medirTempo(false, mapaAtual);
+		//medirtempo(false, mapaAtual);
 	}
 	return 0;
 }
