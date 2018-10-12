@@ -116,8 +116,9 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 			sair = true;
 			break;
 		case 32:  // pega ou deposita comida
+			// se alguma posição ao redor da formiga for comida ele pega
 			if (m[x + 1][y] == 5 || m[x - 1][y] == 5 ||
-				m[x][y + 1] == 5 || m[x][y - 1] == 5) // se alguma posição ao redor da formiga for comida ele pegha
+				m[x][y + 1] == 5 || m[x][y - 1] == 5   )
 			{
 				//m[x][y] = 10;
 				//vazio = false;
@@ -125,11 +126,12 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 				{
 
 				}
-				if (x > 12 && y < 3) // armazem 2 (meio)
+				if (x > 4 && x < 8 &&
+					y > 15 && y < 19) // armazem 2 (meio)
 				{
 
 				}
-				if (x > 12 && y < 3) // armazem 3 (cima)
+				if (x < 4 && y > 28) // armazem 3 (cima)
 				{
 
 				}
@@ -140,7 +142,7 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 	}
 }
 
-// função para medir tempo e sortear novo mapa
+// função para medir tempo e sortear novo mapa 
 void medir_tempo(bool inicio, int &mapa)
 {
 	static clock_t tempo_inicial = 0, tempo_final = 0;
