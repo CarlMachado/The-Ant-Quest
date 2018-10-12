@@ -50,14 +50,18 @@ void imprime(int m[L][C], int comida)
 		}
 		cout << endl;
 	}
+	/*-------------- HUD -----------------*/
 	cout << endl << endl;
 	if (comida == 0)
 		cout << "Comida atual: nenhum";
 	else
 		cout << "Comida atual: " << comida;
+	/*------------------------------------*/
 }
 //
 // FIM DA PARTE DE CÓDIGO ESCRITA POR CAIO
+
+/*---------------------------------------------------------------------------------------------------*/
 
 // PARTE DO CÓDIGO ESCRITA POR CARLOS
 //
@@ -93,7 +97,7 @@ void verificarArmazem(int &comida, int &local, int m[L][C], int x, int y, bool &
 	}
 }
 
-// Essa função // verifica se a formiga está ou não com comida
+// Essa função verifica se a formiga está ou não com comida
 void formigaAtual(int m[L][C], int x, int y, bool vazio)
 {
 	if (vazio)
@@ -151,8 +155,7 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 			break;
 		case 32:  // pega ou deposita comida
 			// se alguma posição ao redor da formiga for comida ela pega
-			if (m[x + 1][y] == 5 || m[x - 1][y] == 5 ||
-				m[x][y + 1] == 5 || m[x][y - 1] == 5   )
+			if (m[x + 1][y] == 5 || m[x - 1][y] == 5 || m[x][y + 1] == 5 || m[x][y - 1] == 5   )
 			{
 				if (x > 12 && y < 3) // armazem 1 (inicial baixo)
 				{
@@ -170,11 +173,13 @@ void comandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[],
 			}
 			break;
 		}
-		Sleep(100);
+		Sleep(50);
 	}
 }
 //
 // FIM DA PARTE DE CÓDIGO ESCRITA POR CARLOS
+
+/*---------------------------------------------------------------------------------------------------*/
 
 // PARTE DO CÓDIGO ESCRITA POR MATEUS
 //
@@ -206,6 +211,8 @@ void medir_tempo(bool inicio, int &mapa)
 
 // TANTO A FUNÇÃO MAIN COMO SUAS VARIÁVEIS FORAM MANIPULADAS POR TODO O GRUPO
 //
+
+/*-------------------------------- STRUCTS ------------------------------------*/
 struct Formiga
 {
 	int comida = 0;
@@ -242,21 +249,25 @@ struct Armazem
 {
 	int comida[4] = { 0, 0, 0, 0 };
 };
+/*-----------------------------------------------------------------------------*/
 
 int main()
 {
+	/*-------------------------------- VARIÁVEIS ------------------------------*/
 	Formiga formiga;
 	Mapa mapa;
-	// cada struct do vetor Armazem representa um armazem no jogo
-	Armazem local[3];
+	Armazem local[3]; // cada struct do vetor local representa um armazem no jogo
 	bool sair = false;
+	/*-------------------------------------------------------------------------*/
 
+	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
 	hidecursor();
 	// aqui inicia o armazem inicial
 	local[0].comida[0] = 4;
 	local[0].comida[1] = 3;
 	local[0].comida[2] = 2;
 	local[0].comida[3] = 1;
+	/*-------------------------------------------------------------------------*/
 
 	while (!sair)
 	{
