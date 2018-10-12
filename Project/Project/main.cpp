@@ -56,17 +56,18 @@ void imprime(int m[L][C], int comida, int a1[], int a2[], int a3[])
 		cout << "Comida atual: nenhum\n\n";
 	else
 		cout << "Comida atual: " << comida << "           \n\n"; 
+	/*
+	Neste simples caso eu coloquei espaçoes depois 
+	da variável pois o programa não limpa a tela, mas sim 
+	sobrepõe os caracteres anteriores, então quando o valor 
+	da comida mudava, ficava sobrando uma parte do nenhum.
+	*/
 	cout << "Armazem 1 (BAIXO):\nP1: " << a1[0] << " | P2: " << a1[1] << " | P3: " << a1[2] << " | P4: " << a1[3] << endl << endl;
 	cout << "Armazem 2  (MEIO):\nP1: " << a2[0] << " | P2: " << a2[1] << " | P3: " << a2[2] << " | P4: " << a2[3] << endl << endl;
 	cout << "Armazem 3  (CIMA):\nP1: " << a3[0] << " | P2: " << a3[1] << " | P3: " << a3[2] << " | P4: " << a3[3] << endl << endl;
 	/* 
-	CAIO, neste simples caso eu coloquei espaçoes depois 
-	da variável pois o programa não limpa a tela, mas sim 
-	sobrepõe os caracteres anteriores, então quando o valor 
-	da comida mudava, ficava sobrando uma parte do nenhum.
-
 	O armazém está sem acento pois quando fui implementar
-	o setlocale, bugou o caractere responsável pelo mapa.
+	o setlocale, bugou os caracteres responsáveis pelo mapa.
 	*/
 	/*------------------------------------*/
 }
@@ -144,6 +145,7 @@ void iniciarArmazem(int comida[])
 void verificarArmazem(int &comida, int local[], int m[L][C], int x, int y, bool &vazio)
 {
 	int i;
+	bool s = false;
 	if (comida == 0)
 	{
 		for (i = 3; i >= 0; i--)
@@ -164,13 +166,11 @@ void verificarArmazem(int &comida, int local[], int m[L][C], int x, int y, bool 
 			if (local[i] == 0)
 			{
 				if (i == 0)
-				{
-					local[i] = comida;
-					comida = 0;
-					m[x][y] = 9;
-					vazio = true;
-				}
+					s = true;
 				else if (comida < local[i-1])
+					s = true;
+
+				if (s)
 				{
 					local[i] = comida;
 					comida = 0;
