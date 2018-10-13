@@ -1,14 +1,30 @@
+/*
+DESCRIÇÃO: Jogo criado para a disciplina de Algoritmos e Programação, referente à M2.
+
+AUTORES: Carlos Eduardo de Bobra Machado;
+	 Caio Gonzaga Bernils;
+	 Mateus Luis Ropke Lauer.
+*/
+
+// BIBLIOTECAS DO SISTEMA
+//
 #include <iostream>
 #include <windows.h>
 #include <conio.h>
 #include <time.h>
+//
+// BIBLIOTECAS DO PROGRAMA
+//
 
+//
+// CONSTANTES
 #define L 16
 #define C 32
+#define TEMPO_MAXIMO 120000.0
 
 using namespace std;
 
-void escondercursor()
+void esconderCursor()
 {
 	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO info;
@@ -33,15 +49,19 @@ void mgotoxy(int x, int y)
 
 /*
 CAIO:
-	- Implementar um menu para escolher jogo difícil ou fácil;
-	- Criar mais dois mapas (só alterar os caminhos, os armazéns precisam estar no mesmo local):
-		- A função preenchermapas() já foi iniciada para isso;
+	- Implementar um menu para escolher jogo difícil ou fácil:
+		- Seria interessante a implementação de um menu com as tleclas W e S para selecionar as
+		  opções do menu, assim combinando com o resto do jogo;
+		- O menu pode ser rodado em um laço exclusivo ou então no laço principal com uma variável
+		  booleana de controle;
+	- Criar mais dois mapas:
+		- Só alterar os caminhos, os armazéns precisam estar no mesmo local;
 		- Colocar os dois outros mapas criados dentro do "para" pra poder preencher as outras matrizes.
 */
 // PARTE DO CÓDIGO ESCRITA POR CAIO
 //
 // Responsável por preencher as matrizes
-void preenchermapas(int m1[L][C], int m2[L][C], int m3[L][C])
+void preencherMapas(int m1[L][C], int m2[L][C], int m3[L][C])
 {
 	int mapa1[L][C] =
 	{
@@ -116,7 +136,8 @@ void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[])
 		cout << endl;
 	}
 	/*-------------- HUD -----------------*/
-	cout << endl << endl;
+	cout << endl;
+	cout << "Tempo ate o terremoto: " << "variavel" << endl;
 	if (comida == 0)
 		cout << "Comida atual da formiga: nenhum\n\n";
 	else
@@ -132,7 +153,7 @@ void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[])
 }
 
 // Verifica se a formiga está ou não com comida
-void formigaatual(int m[L][C], int x, int y, bool vazio)
+void formigaAtual(int m[L][C], int x, int y, bool vazio)
 {
 	if (vazio)
 		m[x][y] = 9;
@@ -141,7 +162,7 @@ void formigaatual(int m[L][C], int x, int y, bool vazio)
 }
 
 // Inicializa o armazém inicial
-void iniciararmazem(int comida[])
+void iniciarArmazem(int comida[])
 {
 	int i, j = 4;
 	for (i = 0; i < 4; i++)
@@ -152,7 +173,7 @@ void iniciararmazem(int comida[])
 }
 
 // Nessa função verifica-se se vai retirar ou colocar a comida no armazém
-void verificararmazem(int &comida, int local[], int m[L][C], int x, int y, bool &vazio, bool &fim)
+void verificarArmazem(int &comida, int local[], int m[L][C], int x, int y, bool &vazio, bool &fim)
 {
 	int i;
 	bool s = false;
@@ -197,7 +218,7 @@ void verificararmazem(int &comida, int local[], int m[L][C], int x, int y, bool 
 }
 
 // Nessa função são executados os comandos do jogo
-void lercomandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[], bool &vazio, int &comidaatualformiga, bool &fim)
+void lerComandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[], bool &vazio, int &comidaAtualFormiga, bool &fim)
 {
 	static int x = 1, y = 1;
 	char tecla;
@@ -213,7 +234,7 @@ void lercomandos(int m[L][C], bool &sair, int local1[], int local2[], int local3
 			{
 				m[x][y] = 0;
 				x--;
-				formigaatual(m, x, y, vazio);
+				formigaAtual(m, x, y, vazio);
 			}
 			break;
 		case 's': //baixo
@@ -221,7 +242,7 @@ void lercomandos(int m[L][C], bool &sair, int local1[], int local2[], int local3
 			{
 				m[x][y] = 0;
 				x++;
-				formigaatual(m, x, y, vazio);
+				formigaAtual(m, x, y, vazio);
 			}
 			break;
 		case 'a': //esquerda
@@ -229,7 +250,7 @@ void lercomandos(int m[L][C], bool &sair, int local1[], int local2[], int local3
 			{
 				m[x][y] = 0;
 				y--;
-				formigaatual(m, x, y, vazio);
+				formigaAtual(m, x, y, vazio);
 			}
 			break;
 		case 'd': //direita
@@ -237,7 +258,7 @@ void lercomandos(int m[L][C], bool &sair, int local1[], int local2[], int local3
 			{
 				m[x][y] = 0;
 				y++;
-				formigaatual(m, x, y, vazio);
+				formigaAtual(m, x, y, vazio);
 			}
 			break;
 		case 27: // sair
@@ -249,25 +270,25 @@ void lercomandos(int m[L][C], bool &sair, int local1[], int local2[], int local3
 			{
 				if (x > 10 && y < 5) // armazem 1 (inicial baixo)
 				{
-					verificararmazem(comidaatualformiga, local1, m, x, y, vazio, fim);
+					verificarArmazem(comidaAtualFormiga, local1, m, x, y, vazio, fim);
 				}
 				if (x > 5 && x < 10 && y > 14 && y < 20) // armazem 2 (meio)
 				{
-					verificararmazem(comidaatualformiga, local2, m, x, y, vazio, fim);
+					verificarArmazem(comidaAtualFormiga, local2, m, x, y, vazio, fim);
 				}
 				if (x < 5 && y > 25) // armazem 3 (cima)
 				{
-					verificararmazem(comidaatualformiga, local3, m, x, y, vazio, fim);
+					verificarArmazem(comidaAtualFormiga, local3, m, x, y, vazio, fim);
 				}
 			}
 			break;
 		}
-		//Sleep(50);
+		Sleep(50);
 	}
 }
 
 // Verificam de o jogador venceu
-bool venceud(int a[])
+bool venceuDificil(int a[])
 {
 	int i;
 	for (i = 0; i < 4; i++)
@@ -276,7 +297,7 @@ bool venceud(int a[])
 	return true;
 }
 
-bool venceuf(int a[])
+bool venceuFacil(int a[])
 {
 	if (a[0] == 4)
 		return true;
@@ -285,7 +306,7 @@ bool venceuf(int a[])
 //-------------------------------
 
 // Mostram a tela de Game Over
-bool fimjogo()
+bool fimJogo()
 {
 	system("cls");
 	cout << "VOCE COLOCOU A COMIDA MAIOR EM CIMA DA MENOR E AGORA TODO MUNDO VAI MORRER DE FOME!!!\n\n";
@@ -293,7 +314,7 @@ bool fimjogo()
 	return true;
 }
 
-bool venceujogo()
+bool venceuJogo()
 {
 	system("cls");
 	cout << "VOCE VENCEU O JOGO, PARABENS!!!\n\n";
@@ -315,32 +336,30 @@ bool venceujogo()
 
 /*
 MATEUS:
-	- Criar uma função/método que realize a troca do mapa:
-		- A função medirtempo() já foi iniciada para isso.
+	- Criar uma função/método que realize a troca do mapa.
 */
 // PARTE DO CÓDIGO ESCRITA POR MATEUS
 //
 // função para medir tempo e sortear novo mapa 
-void medirtempo(bool inicio, int &mapa)
+void medirTempo(bool inicio, int &mapa)
 {
-	static clock_t tempo_inicial = 0, tempo_final = 0;
-	static double tempo_total;
-	const double TEMPO_MAXIMO = 120000.0;
+	static clock_t tempoInicial = 0, tempoFinal = 0;
+	static double tempoTotal;
 
 	// Não cheguei nem a testar esse código (CARLOS).
 	if (inicio)
 	{
-		tempo_inicial = clock();
+		tempoInicial = clock();
 	}
 	else
 	{
-		tempo_final = clock();
-		tempo_total += (tempo_final - tempo_inicial) / (double)CLOCKS_PER_SEC;
-		if (tempo_total >= TEMPO_MAXIMO)
+		tempoFinal = clock();
+		tempoTotal += (tempoFinal - tempoInicial) / (double)CLOCKS_PER_SEC;
+		if (tempoTotal >= TEMPO_MAXIMO)
 		{
 			srand(time(NULL));
 			mapa = rand() % 2;
-			tempo_total = 0.0;
+			tempoTotal = 0.0;
 		}
 	}
 }
@@ -363,7 +382,7 @@ void medirtempo(bool inicio, int &mapa)
 /*-------------------------------- STRUCTS ------------------------------------*/
 struct Formiga
 {
-	int comidaatual = 0;
+	int comidaAtual = 0;
 	bool vazio = true;
 };
 
@@ -382,40 +401,40 @@ int main()
 {
 	/*-------------------------------- VARIÁVEIS ------------------------------*/
 	Mapa mapa[3];
-	Armazem armazem[3]; // cada struct do vetor local representa um armazem no jogo
+	Armazem armazem[3]; // cada struct do vetor local representa um armazem no jogo, e cada tipo de comida só pode estar em um deles
 	Formiga formiga;
-	int mapaatual = 0;
+	int mapaAtual = 0;
 	bool sair = false;
 	bool fim = false;
 	bool facil = true;
 	/*-------------------------------------------------------------------------*/
 
 	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
-	escondercursor();
-	preenchermapas(mapa[0].m, mapa[1].m, mapa[2].m);
-	iniciararmazem(armazem[0].lugares);
+	esconderCursor();
+	preencherMapas(mapa[0].m, mapa[1].m, mapa[2].m);
+	iniciarArmazem(armazem[0].lugares);
 	//setlocale(LC_ALL, "Portuguese"); //AO TENTAR USAR O SETLOCALE BUGOU TODOS OS CARACTERES DO MAPA
 	/*-------------------------------------------------------------------------*/
 
 	while (!sair)
 	{
-		//medirtempo(true, mapaAtual);
-		imprimir(mapa[mapaatual].m, formiga.comidaatual, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares);
-		lercomandos(mapa[mapaatual].m, sair, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares, formiga.vazio, formiga.comidaatual, fim);
+		//medirTempo(true, mapaAtual);
+		imprimir(mapa[mapaAtual].m, formiga.comidaAtual, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares);
+		lerComandos(mapa[mapaAtual].m, sair, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares, formiga.vazio, formiga.comidaAtual, fim);
 		mgotoxy(0, 0);
 		if (fim)
-			sair = fimjogo();
+			sair = fimJogo();
 		if (facil)
 		{
-			if (venceuf(armazem[2].lugares))
-				sair = venceujogo();
+			if (venceuFacil(armazem[2].lugares))
+				sair = venceuJogo();
 		}
 		else
 		{
-			if (venceud(armazem[2].lugares))
-				sair = venceujogo();
+			if (venceuDificil(armazem[2].lugares))
+				sair = venceuJogo();
 		}
-			//medirtempo(false, mapaAtual);
+		//medirTempo(false, mapaAtual);
 	}
 	return 0;
 }
