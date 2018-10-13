@@ -2,8 +2,8 @@
 DESCRIÇÃO: Jogo criado para a disciplina de Algoritmos e Programação, referente à M2.
 
 AUTORES: Carlos Eduardo de Bobra Machado;
-	 Caio Gonzaga Bernils;
-	 Mateus Luis Ropke Lauer.
+		 Caio Gonzaga Bernils;
+		 Mateus Luis Ropke Lauer.
 */
 
 // BIBLIOTECAS DO SISTEMA
@@ -18,9 +18,10 @@ AUTORES: Carlos Eduardo de Bobra Machado;
 
 //
 // CONSTANTES
+
 #define L 16
 #define C 32
-#define TEMPO_MAXIMO 120000.0
+#define TEMPO_MAXIMO 45.0
 
 using namespace std;
 
@@ -40,10 +41,7 @@ void mgotoxy(int x, int y)
 
 
 
-
-
 /*---------------------------------------------------------------------------------------------------*/
-
 
 
 
@@ -91,6 +89,8 @@ void preencherMapas(int m1[L][C], int m2[L][C], int m3[L][C])
 		for (int j = 0; j < C; j++)
 		{
 			m1[i][j] = mapa1[i][j];
+			m2[i][j] = mapa1[i][j]+2;
+			m3[i][j] = mapa1[i][j]+1;
 		}
 
 	}
@@ -100,18 +100,14 @@ void preencherMapas(int m1[L][C], int m2[L][C], int m3[L][C])
 
 
 
-
-
 /*---------------------------------------------------------------------------------------------------*/
-
-
 
 
 
 // PARTE DO CÓDIGO ESCRITA POR CARLOS
 //
 // Nessa função a matriz é percorrida e os números são substituidos
-void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[])
+void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[], double tempo)
 {
 	for (int i = 0; i < L; i++)
 	{
@@ -140,11 +136,11 @@ void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[])
 	/*-------------- HUD -----------------*/
 
 	cout << endl;
-	cout << "Tempo ate o terremoto: " << "variavel" << endl;
+	cout << "Tempo ate o terremoto: " << (int)tempo << "   " << endl;
 	if (comida == 0)
 		cout << "Comida atual da formiga: nenhum\n\n";
 	else
-		cout << "Comida atual da formiga: " << comida << "         "<< endl << endl;
+		cout << "Comida atual da formiga: " << comida << "         " << endl << endl;
 	cout << "Armazem 1 (BAIXO):\nP1: " << a1[0] << " | P2: " << a1[1] << " | P3: " << a1[2] << " | P4: " << a1[3] << endl << endl;
 	cout << "Armazem 2  (MEIO):\nP1: " << a2[0] << " | P2: " << a2[1] << " | P3: " << a2[2] << " | P4: " << a2[3] << endl << endl;
 	cout << "Armazem 3  (CIMA):\nP1: " << a3[0] << " | P2: " << a3[1] << " | P3: " << a3[2] << " | P4: " << a3[3] << endl << endl;
@@ -327,10 +323,7 @@ bool venceuJogo()
 
 
 
-
-
 /*---------------------------------------------------------------------------------------------------*/
-
 
 
 
@@ -342,12 +335,8 @@ MATEUS:
 // PARTE DO CÓDIGO ESCRITA POR MATEUS
 //
 // função para medir tempo e sortear novo mapa 
-void medirTempo(bool inicio, int &mapa)
+void medirTempo(bool inicio, int &mapa, clock_t &tempoInicial, clock_t &tempoFinal, double &tempoTotal)
 {
-	static clock_t tempoInicial = 0, tempoFinal = 0;
-	static double tempoTotal;
-
-	// Não cheguei nem a testar esse código (CARLOS).
 	if (inicio)
 	{
 		tempoInicial = clock();
@@ -355,12 +344,12 @@ void medirTempo(bool inicio, int &mapa)
 	else
 	{
 		tempoFinal = clock();
-		tempoTotal += (tempoFinal - tempoInicial) / (double)CLOCKS_PER_SEC;
-		if (tempoTotal >= TEMPO_MAXIMO)
+		tempoTotal -= (tempoFinal - tempoInicial) / (double)CLOCKS_PER_SEC;
+		if (tempoTotal < 0)
 		{
 			srand(time(NULL));
 			mapa = rand() % 2;
-			tempoTotal = 0.0;
+			tempoTotal = TEMPO_MAXIMO;
 		}
 	}
 }
@@ -369,11 +358,7 @@ void medirTempo(bool inicio, int &mapa)
 
 
 
-
-
 /*---------------------------------------------------------------------------------------------------*/
-
-
 
 
 
@@ -399,10 +384,17 @@ struct Armazem
 
 struct Controle
 {
-	bool menu = false;
-	bool sair = false;
-	bool fim = false;
-	bool facil = true;
+	bool menu = false,
+		 sair = false,
+		 fim = false,
+		 facil = true;
+
+	clock_t tempoInicial = 0, 
+			tempoFinal = 0;
+
+	double tempoTotal = TEMPO_MAXIMO;
+
+	int mapaAtual = 0;
 };
 /*-----------------------------------------------------------------------------*/
 
@@ -410,10 +402,9 @@ int main()
 {
 	/*-------------------------------- VARIÁVEIS ------------------------------*/
 	Mapa mapa[3];
-	Armazem armazem[3]; // cada struct do vetor local representa um armazem no jogo, e cada tipo de comida só pode estar em um deles
+	Armazem armazem[3]; // cada struct do vetor representa um armazem no jogo
 	Formiga formiga;
 	Controle controle;
-	int mapaAtual = 0;
 	/*-------------------------------------------------------------------------*/
 
 	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
@@ -427,30 +418,26 @@ int main()
 
 	while (!controle.sair)
 	{
-		//medirTempo(true, mapaAtual);
+		medirTempo(true, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal);
 		if (controle.menu)
 		{
 
 		}
 		else
 		{
-			imprimir(mapa[mapaAtual].m, formiga.comidaAtual, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares);
-			lerComandos(mapa[mapaAtual].m, controle.sair, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares, formiga.vazio, formiga.comidaAtual, controle.fim);
+			imprimir(mapa[controle.mapaAtual].m, formiga.comidaAtual, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares, controle.tempoTotal);
+			lerComandos(mapa[controle.mapaAtual].m, controle.sair, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares, formiga.vazio, formiga.comidaAtual, controle.fim);
 		}
 		mgotoxy(0, 0);
 		if (controle.fim)
 			controle.sair = fimJogo();
 		if (controle.facil)
-		{
 			if (venceuFacil(armazem[2].lugares))
 				controle.sair = venceuJogo();
-		}
 		else
-		{
 			if (venceuDificil(armazem[2].lugares))
 				controle.sair = venceuJogo();
-		}
-		//medirTempo(false, mapaAtual);
+		medirTempo(false, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal);
 	}
 	return 0;
 }
