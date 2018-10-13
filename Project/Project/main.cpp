@@ -52,6 +52,8 @@ CAIO:
 	- Implementar um menu para escolher jogo difícil ou fácil:
 		- Seria interessante a implementação de um menu com as tleclas W e S para selecionar as
 		  opções do menu, assim combinando com o resto do jogo;
+		- O menu pode ter intruções dizendo: "Use as teclas W e S para movimentar o menu" e
+		  "Use as teclas W, A, S e D para movimentar a formiga";
 		- O menu pode ser rodado no laço principal usando a variável booleana controle.menu;
 	- Criar mais dois mapas:
 		- Só alterar os caminhos, os armazéns precisam estar no mesmo local;
@@ -334,7 +336,8 @@ bool venceuJogo()
 
 /*
 MATEUS:
-	- Criar uma função/método que realize a troca do mapa.
+	- Criar uma função/método que realize a troca do mapa;
+	- Criar uma variável para mostrar o cronometro na tela.
 */
 // PARTE DO CÓDIGO ESCRITA POR MATEUS
 //
