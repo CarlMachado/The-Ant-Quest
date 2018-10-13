@@ -154,8 +154,6 @@ void verificararmazem(int &comida, int local[], int m[L][C], int x, int y, bool 
 	{
 		for (i = 3; i >= 0; i--)
 		{
-			a[i] = local[i];
-
 			if (local[i] != 0)
 			{
 				comida = local[i];
@@ -258,7 +256,7 @@ void lercomandos(int m[L][C], bool &sair, int local1[], int local2[], int local3
 			}
 			break;
 		}
-		//Sleep(50);
+		Sleep(50);
 	}
 }
 //
