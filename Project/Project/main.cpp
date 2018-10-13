@@ -52,8 +52,7 @@ CAIO:
 	- Implementar um menu para escolher jogo difícil ou fácil:
 		- Seria interessante a implementação de um menu com as tleclas W e S para selecionar as
 		  opções do menu, assim combinando com o resto do jogo;
-		- O menu pode ser rodado em um laço exclusivo ou então no laço principal com uma variável
-		  booleana de controle;
+		- O menu pode ser rodado no laço principal usando a variável booleana controle.menu;
 	- Criar mais dois mapas:
 		- Só alterar os caminhos, os armazéns precisam estar no mesmo local;
 		- Colocar os dois outros mapas criados dentro do "para" pra poder preencher as outras matrizes.
@@ -135,7 +134,9 @@ void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[])
 		}
 		cout << endl;
 	}
+
 	/*-------------- HUD -----------------*/
+
 	cout << endl;
 	cout << "Tempo ate o terremoto: " << "variavel" << endl;
 	if (comida == 0)
@@ -145,10 +146,7 @@ void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[])
 	cout << "Armazem 1 (BAIXO):\nP1: " << a1[0] << " | P2: " << a1[1] << " | P3: " << a1[2] << " | P4: " << a1[3] << endl << endl;
 	cout << "Armazem 2  (MEIO):\nP1: " << a2[0] << " | P2: " << a2[1] << " | P3: " << a2[2] << " | P4: " << a2[3] << endl << endl;
 	cout << "Armazem 3  (CIMA):\nP1: " << a3[0] << " | P2: " << a3[1] << " | P3: " << a3[2] << " | P4: " << a3[3] << endl << endl;
-	/*
-	O armazém está sem acento pois quando fui implementar
-	o setlocale, bugou os caracteres responsáveis pelo mapa.
-	*/
+
 	/*------------------------------------*/
 }
 
@@ -395,6 +393,14 @@ struct Armazem
 {
 	int lugares[4] = {0, 0, 0, 0};
 };
+
+struct Controle
+{
+	bool menu = false;
+	bool sair = false;
+	bool fim = false;
+	bool facil = true;
+};
 /*-----------------------------------------------------------------------------*/
 
 int main()
@@ -403,36 +409,43 @@ int main()
 	Mapa mapa[3];
 	Armazem armazem[3]; // cada struct do vetor local representa um armazem no jogo, e cada tipo de comida só pode estar em um deles
 	Formiga formiga;
+	Controle controle;
 	int mapaAtual = 0;
-	bool sair = false;
-	bool fim = false;
-	bool facil = true;
 	/*-------------------------------------------------------------------------*/
 
 	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
 	esconderCursor();
 	preencherMapas(mapa[0].m, mapa[1].m, mapa[2].m);
 	iniciarArmazem(armazem[0].lugares);
-	//setlocale(LC_ALL, "Portuguese"); //AO TENTAR USAR O SETLOCALE BUGOU TODOS OS CARACTERES DO MAPA
+	//setlocale(LC_ALL, "Portuguese");
+	//AO TENTAR USAR O SETLOCALE BUGOU TODOS OS CARACTERES DO MAPA
+	//POR ISSO AS PALAVRAS ESTÃO SEM ACENTO
 	/*-------------------------------------------------------------------------*/
 
-	while (!sair)
+	while (!controle.sair)
 	{
 		//medirTempo(true, mapaAtual);
-		imprimir(mapa[mapaAtual].m, formiga.comidaAtual, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares);
-		lerComandos(mapa[mapaAtual].m, sair, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares, formiga.vazio, formiga.comidaAtual, fim);
+		if (controle.menu)
+		{
+
+		}
+		else
+		{
+			imprimir(mapa[mapaAtual].m, formiga.comidaAtual, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares);
+			lerComandos(mapa[mapaAtual].m, controle.sair, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares, formiga.vazio, formiga.comidaAtual, controle.fim);
+		}
 		mgotoxy(0, 0);
-		if (fim)
-			sair = fimJogo();
-		if (facil)
+		if (controle.fim)
+			controle.sair = fimJogo();
+		if (controle.facil)
 		{
 			if (venceuFacil(armazem[2].lugares))
-				sair = venceuJogo();
+				controle.sair = venceuJogo();
 		}
 		else
 		{
 			if (venceuDificil(armazem[2].lugares))
-				sair = venceuJogo();
+				controle.sair = venceuJogo();
 		}
 		//medirTempo(false, mapaAtual);
 	}
