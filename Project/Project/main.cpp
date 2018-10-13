@@ -31,7 +31,13 @@ void mgotoxy(int x, int y)
 
 
 
-
+/*
+CAIO:
+	- Implementar um menu para escolher jogo difícil ou fácil.
+	- Criar mais dois mapas (só alterar os caminhos, os armazéns precisam estar no mesmo local)
+		- A função preenchermapas() já foi iniciada para isso
+		- Colocar os dois outros mapas criados dentro do "para" pra poder preencher as outras matrizes
+*/
 // PARTE DO CÓDIGO ESCRITA POR CAIO
 //
 // Responsável por preencher as matrizes
@@ -112,9 +118,9 @@ void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[])
 	/*-------------- HUD -----------------*/
 	cout << endl << endl;
 	if (comida == 0)
-		cout << "Comida atual: nenhum\n\n";
+		cout << "Comida atual da formiga: nenhum\n\n";
 	else
-		cout << "Comida atual da formiga: " << comida << endl << endl;
+		cout << "Comida atual da formiga: " << comida << "         "<< endl << endl;
 	cout << "Armazem 1 (BAIXO):\nP1: " << a1[0] << " | P2: " << a1[1] << " | P3: " << a1[2] << " | P4: " << a1[3] << endl << endl;
 	cout << "Armazem 2  (MEIO):\nP1: " << a2[0] << " | P2: " << a2[1] << " | P3: " << a2[2] << " | P4: " << a2[3] << endl << endl;
 	cout << "Armazem 3  (CIMA):\nP1: " << a3[0] << " | P2: " << a3[1] << " | P3: " << a3[2] << " | P4: " << a3[3] << endl << endl;
@@ -256,9 +262,45 @@ void lercomandos(int m[L][C], bool &sair, int local1[], int local2[], int local3
 			}
 			break;
 		}
-		Sleep(50);
+		//Sleep(50);
 	}
 }
+
+// Verificam de o jogador venceu
+bool venceud(int a[])
+{
+	int i;
+	for (i = 0; i < 4; i++)
+		if (a[i] == 0)
+			return false;
+	return true;
+}
+
+bool venceuf(int a[])
+{
+	if (a[0] == 4)
+		return true;
+	return false;
+}
+//-------------------------------
+
+// Mostram a tela de Game Over
+bool fimjogo()
+{
+	system("cls");
+	cout << "VOCE COLOCOU A COMIDA MAIOR EM CIMA DA MENOR E AGORA TODO MUNDO VAI MORRER DE FOME!!!\n\n";
+	system("pause");
+	return true;
+}
+
+bool venceujogo()
+{
+	system("cls");
+	cout << "VOCE VENCEU O JOGO, PARABENS!!!\n\n";
+	system("pause");
+	return true;
+}
+//-------------------------------
 //
 // FIM DA PARTE DE CÓDIGO ESCRITA POR CARLOS
 
@@ -271,7 +313,11 @@ void lercomandos(int m[L][C], bool &sair, int local1[], int local2[], int local3
 
 
 
-
+/*
+MATEUS:
+	- Criar uma função/método que realize a troca do mapa
+		- A função medirtempo() já foi iniciada para isso
+*/
 // PARTE DO CÓDIGO ESCRITA POR MATEUS
 //
 // função para medir tempo e sortear novo mapa 
@@ -281,11 +327,7 @@ void medirtempo(bool inicio, int &mapa)
 	static double tempo_total;
 	const double TEMPO_MAXIMO = 120000.0;
 
-	/*
-	Não cheguei nem a testar esse código, não sei se a cada
-	chamada do código pode ter aquela inicialização em 0 das
-	variáveis (CARLOS).
-	*/
+	// Não cheguei nem a testar esse código (CARLOS).
 	if (inicio)
 	{
 		tempo_inicial = clock();
@@ -304,6 +346,12 @@ void medirtempo(bool inicio, int &mapa)
 }
 //
 // FIM DA PARTE DE CÓDIGO ESCRITA POR MATEUS
+
+
+
+
+
+/*---------------------------------------------------------------------------------------------------*/
 
 
 
@@ -339,6 +387,7 @@ int main()
 	int mapaatual = 0;
 	bool sair = false;
 	bool fim = false;
+	bool facil = true;
 	/*-------------------------------------------------------------------------*/
 
 	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
@@ -354,14 +403,19 @@ int main()
 		imprimir(mapa[mapaatual].m, formiga.comidaatual, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares);
 		lercomandos(mapa[mapaatual].m, sair, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares, formiga.vazio, formiga.comidaatual, fim);
 		mgotoxy(0, 0);
-		//medirtempo(false, mapaAtual);
 		if (fim)
+			sair = fimjogo();
+		if (facil)
 		{
-			sair = true;
-			system("cls");
-			cout << "VOCE COLOCOU A COMIDA MAIOR EM CIMA DA MENOR E AGORA TODO MUNDO VAI MORRER DE FOME!!!\n\n";
-			system("pause");
+			if (venceuf(armazem[2].lugares))
+				sair = venceujogo();
 		}
+		else
+		{
+			if (venceud(armazem[2].lugares))
+				sair = venceujogo();
+		}
+			//medirtempo(false, mapaAtual);
 	}
 	return 0;
 }
