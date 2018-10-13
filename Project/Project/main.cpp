@@ -33,14 +33,14 @@ void mgotoxy(int x, int y)
 
 /*
 CAIO:
-	- Implementar um menu para escolher jogo difícil ou fácil.
-	- Criar mais dois mapas (só alterar os caminhos, os armazéns precisam estar no mesmo local)
-		- A função preenchermapas() já foi iniciada para isso
-		- Colocar os dois outros mapas criados dentro do "para" pra poder preencher as outras matrizes
+	- Implementar um menu para escolher jogo difÃ­cil ou fÃ¡cil;
+	- Criar mais dois mapas (sÃ³ alterar os caminhos, os armazÃ©ns precisam estar no mesmo local):
+		- A funÃ§Ã£o preenchermapas() jÃ¡ foi iniciada para isso;
+		- Colocar os dois outros mapas criados dentro do "para" pra poder preencher as outras matrizes.
 */
-// PARTE DO CÓDIGO ESCRITA POR CAIO
+// PARTE DO CÃ“DIGO ESCRITA POR CAIO
 //
-// Responsável por preencher as matrizes
+// ResponsÃ¡vel por preencher as matrizes
 void preenchermapas(int m1[L][C], int m2[L][C], int m3[L][C])
 {
 	int mapa1[L][C] =
@@ -75,7 +75,7 @@ void preenchermapas(int m1[L][C], int m2[L][C], int m3[L][C])
 	}
 }
 //
-// FIM DA PARTE DE CÓDIGO ESCRITA POR CAIO
+// FIM DA PARTE DE CÃ“DIGO ESCRITA POR CAIO
 
 
 
@@ -87,9 +87,9 @@ void preenchermapas(int m1[L][C], int m2[L][C], int m3[L][C])
 
 
 
-// PARTE DO CÓDIGO ESCRITA POR CARLOS
+// PARTE DO CÃ“DIGO ESCRITA POR CARLOS
 //
-// Nessa função a matriz é percorrida e os números são substituidos
+// Nessa funÃ§Ã£o a matriz Ã© percorrida e os nÃºmeros sÃ£o substituidos
 void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[])
 {
 	for (int i = 0; i < L; i++)
@@ -125,13 +125,13 @@ void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[])
 	cout << "Armazem 2  (MEIO):\nP1: " << a2[0] << " | P2: " << a2[1] << " | P3: " << a2[2] << " | P4: " << a2[3] << endl << endl;
 	cout << "Armazem 3  (CIMA):\nP1: " << a3[0] << " | P2: " << a3[1] << " | P3: " << a3[2] << " | P4: " << a3[3] << endl << endl;
 	/*
-	O armazém está sem acento pois quando fui implementar
-	o setlocale, bugou os caracteres responsáveis pelo mapa.
+	O armazÃ©m estÃ¡ sem acento pois quando fui implementar
+	o setlocale, bugou os caracteres responsÃ¡veis pelo mapa.
 	*/
 	/*------------------------------------*/
 }
 
-// Verifica se a formiga está ou não com comida
+// Verifica se a formiga estÃ¡ ou nÃ£o com comida
 void formigaatual(int m[L][C], int x, int y, bool vazio)
 {
 	if (vazio)
@@ -140,7 +140,7 @@ void formigaatual(int m[L][C], int x, int y, bool vazio)
 		m[x][y] = 10;
 }
 
-// Inicializa o armazém inicial
+// Inicializa o armazÃ©m inicial
 void iniciararmazem(int comida[])
 {
 	int i, j = 4;
@@ -151,7 +151,7 @@ void iniciararmazem(int comida[])
 	}
 }
 
-// Nessa função verifica-se se vai retirar ou colocar a comida no armazém
+// Nessa funÃ§Ã£o verifica-se se vai retirar ou colocar a comida no armazÃ©m
 void verificararmazem(int &comida, int local[], int m[L][C], int x, int y, bool &vazio, bool &fim)
 {
 	int i;
@@ -196,7 +196,7 @@ void verificararmazem(int &comida, int local[], int m[L][C], int x, int y, bool 
 	}
 }
 
-// Nessa função são executados os comandos do jogo
+// Nessa funÃ§Ã£o sÃ£o executados os comandos do jogo
 void lercomandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[], bool &vazio, int &comidaatualformiga, bool &fim)
 {
 	static int x = 1, y = 1;
@@ -244,7 +244,7 @@ void lercomandos(int m[L][C], bool &sair, int local1[], int local2[], int local3
 			sair = true;
 			break;
 		case 32:  // pega ou deposita comida
-			// se alguma posição ao redor da formiga for comida ela pega
+			// se alguma posiÃ§Ã£o ao redor da formiga for comida ela pega
 			if (m[x + 1][y] == 5 || m[x - 1][y] == 5 || m[x][y + 1] == 5 || m[x][y - 1] == 5   )
 			{
 				if (x > 10 && y < 5) // armazem 1 (inicial baixo)
@@ -302,7 +302,7 @@ bool venceujogo()
 }
 //-------------------------------
 //
-// FIM DA PARTE DE CÓDIGO ESCRITA POR CARLOS
+// FIM DA PARTE DE CÃ“DIGO ESCRITA POR CARLOS
 
 
 
@@ -315,19 +315,19 @@ bool venceujogo()
 
 /*
 MATEUS:
-	- Criar uma função/método que realize a troca do mapa
-		- A função medirtempo() já foi iniciada para isso
+	- Criar uma funÃ§Ã£o/mÃ©todo que realize a troca do mapa:
+		- A funÃ§Ã£o medirtempo() jÃ¡ foi iniciada para isso.
 */
-// PARTE DO CÓDIGO ESCRITA POR MATEUS
+// PARTE DO CÃ“DIGO ESCRITA POR MATEUS
 //
-// função para medir tempo e sortear novo mapa 
+// funÃ§Ã£o para medir tempo e sortear novo mapa 
 void medirtempo(bool inicio, int &mapa)
 {
 	static clock_t tempo_inicial = 0, tempo_final = 0;
 	static double tempo_total;
 	const double TEMPO_MAXIMO = 120000.0;
 
-	// Não cheguei nem a testar esse código (CARLOS).
+	// NÃ£o cheguei nem a testar esse cÃ³digo (CARLOS).
 	if (inicio)
 	{
 		tempo_inicial = clock();
@@ -345,7 +345,7 @@ void medirtempo(bool inicio, int &mapa)
 	}
 }
 //
-// FIM DA PARTE DE CÓDIGO ESCRITA POR MATEUS
+// FIM DA PARTE DE CÃ“DIGO ESCRITA POR MATEUS
 
 
 
@@ -357,7 +357,7 @@ void medirtempo(bool inicio, int &mapa)
 
 
 
-// TANTO A FUNÇÃO MAIN COMO SUAS VARIÁVEIS FORAM MANIPULADAS POR TODO O GRUPO
+// TANTO A FUNÃ‡ÃƒO MAIN COMO SUAS VARIÃVEIS FORAM MANIPULADAS POR TODO O GRUPO
 //
 
 /*-------------------------------- STRUCTS ------------------------------------*/
@@ -380,7 +380,7 @@ struct Armazem
 
 int main()
 {
-	/*-------------------------------- VARIÁVEIS ------------------------------*/
+	/*-------------------------------- VARIÃVEIS ------------------------------*/
 	Mapa mapa[3];
 	Armazem armazem[3]; // cada struct do vetor local representa um armazem no jogo
 	Formiga formiga;
@@ -390,7 +390,7 @@ int main()
 	bool facil = true;
 	/*-------------------------------------------------------------------------*/
 
-	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
+	/*------------------------------ INICIALIZAÃ‡ÃƒO ----------------------------*/
 	escondercursor();
 	preenchermapas(mapa[0].m, mapa[1].m, mapa[2].m);
 	iniciararmazem(armazem[0].lugares);
