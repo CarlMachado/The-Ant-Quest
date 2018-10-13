@@ -1,5 +1,5 @@
 /*
-DESCRIÇÃO: Jogo criado para a disciplina de Algoritmos e Programação, referente à M2.
+DESCRIÇÃO: Jogo criado para a disciplina de Algoritmos e Programação, referente à A1M2.
 
 AUTORES: Carlos Eduardo de Bobra Machado;
 		 Caio Gonzaga Bernils;
@@ -45,18 +45,7 @@ void mgotoxy(int x, int y)
 
 
 
-/*
-CAIO:
-	- Implementar um menu para escolher jogo difícil ou fácil:
-		- Seria interessante a implementação de um menu com as tleclas W e S para selecionar as
-		  opções do menu, assim combinando com o resto do jogo;
-		- O menu pode ter intruções dizendo: "Use as teclas W e S para movimentar o menu" e
-		  "Use as teclas W, A, S e D para movimentar a formiga";
-		- O menu pode ser rodado no laço principal usando a variável booleana controle.menu;
-	- Criar mais dois mapas:
-		- Só alterar os caminhos, os armazéns precisam estar no mesmo local;
-		- Colocar os dois outros mapas criados dentro do "para" pra poder preencher as outras matrizes.
-*/
+
 // PARTE DO CÓDIGO ESCRITA POR CAIO
 //
 // Responsável por preencher as matrizes
@@ -81,19 +70,124 @@ void preencherMapas(int m1[L][C], int m2[L][C], int m3[L][C])
 		{ 1,6,5,0,1,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,1 },
 		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }
 	};
-	int mapa2[L][C];
-	int mapa3[L][C];
+	int mapa2[L][C] =
+	{
+		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
+		{ 1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,0,5,8,1 },
+		{ 1,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1 },
+		{ 1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,1 },
+		{ 1,1,1,1,1,1,0,1,1,1,0,1,1,0,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,1 },
+		{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,7,1,1,1,1,1,1,1,1,1,1,1,0,1 },
+		{ 1,0,1,1,1,1,1,1,0,1,0,1,1,0,1,1,0,1,5,0,0,1,0,0,0,0,0,0,0,0,0,1 },
+		{ 1,1,1,0,0,0,0,0,0,1,0,1,0,0,0,1,0,1,0,1,0,1,1,1,1,0,1,1,1,1,1,1 },
+		{ 1,1,1,0,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,0,0,0,0,1,0,0,0,0,0,0,1 },
+		{ 1,0,1,0,0,0,0,0,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,0,1 },
+		{ 1,0,1,0,1,1,1,1,1,1,1,1,0,1,0,1,0,1,1,0,0,0,0,0,1,0,1,0,1,1,0,1 },
+		{ 1,0,1,0,1,1,1,1,1,1,1,0,0,0,0,1,0,0,1,1,1,0,1,0,1,0,1,0,1,0,0,1 },
+		{ 1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,1,0,0,0,1,0,0,0,1,0,1,1,1,1 },
+		{ 1,1,0,1,1,0,1,1,1,1,1,0,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,1,1,1 },
+		{ 1,6,5,0,1,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1 },
+		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }
+	};
+	int mapa3[L][C] =
+	{
+		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
+		{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,8,1 },
+		{ 1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,5,1 },
+		{ 1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,0,1 },
+		{ 1,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1 },
+		{ 1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,7,1,0,1,1,1,1,1,1,1,1,1,0,1 },
+		{ 1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,0,0,5,1,0,0,0,0,0,0,0,0,0,0,0,1 },
+		{ 1,0,1,0,0,0,0,0,0,1,0,1,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1 },
+		{ 1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,0,0,0,0,1,0,0,0,0,0,0,1 },
+		{ 1,0,1,0,1,0,0,0,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,0,1 },
+		{ 1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,1,0,0,0,0,0,1,0,1,0,1,1,0,1 },
+		{ 1,0,1,0,1,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,1,0,1,0,1,0,1,0,0,0,0,1 },
+		{ 1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,1,0,0,0,1,0,0,0,1,0,1,1,1,1 },
+		{ 1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,1,1,1 },
+		{ 1,6,5,0,1,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,1 },
+		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }
+	};
 
 	for (int i = 0; i < L; i++)
 	{
 		for (int j = 0; j < C; j++)
 		{
 			m1[i][j] = mapa1[i][j];
-			m2[i][j] = mapa1[i][j]+2;
-			m3[i][j] = mapa1[i][j]+1;
+			m2[i][j] = mapa2[i][j];
+			m3[i][j] = mapa3[i][j];
 		}
 
 	}
+}
+
+//
+void menuSelect(bool &facil, bool &sair, bool &opcao, bool &menu) 
+{
+	char tecla;
+
+	if (_kbhit())
+	{
+		tecla = _getch();
+
+		switch (tecla)
+		{
+		case 'w': //cima
+			if (opcao)
+			{
+				opcao = false;
+			}
+			break;
+		case 's': //baixo
+			if (!opcao)
+			{
+				opcao = true;
+			}
+			break;
+		case 27: // sair
+			sair = true;
+			break;
+		case 32:
+			if (opcao)
+				facil = false;
+			else
+				facil = true;
+			menu = false;
+			break;
+		}
+	}
+
+	cout << "********************************" << endl;
+	cout << "*                              *" << endl;
+	cout << "*                              *" << endl;
+	if (!opcao) {
+	cout << "*           * Facil *          *" << endl;
+	}
+	else {
+	cout << "*             Facil            *" << endl;
+	}
+	cout << "*                              *" << endl;
+	if (opcao) {
+	cout << "*          * Dificil *         *" << endl;
+	}
+	else {
+	cout << "*            Dificil           *" << endl;
+	}
+	cout << "*                              *" << endl;
+	cout << "*                              *" << endl;
+	cout << "*          Instrucoes:         *" << endl;
+	cout << "*                              *" << endl;
+	cout << "* O deposito esta demoronando, *" << endl;
+	cout << "*    retire todas as comidas   *" << endl;
+	cout << "* do primeiro e leve para o 3. *" << endl;
+	cout << "*  As comidas possuem tamanho, *" << endl;
+	cout << "*  as maiores sempre em baixo. *" << endl;
+	cout << "*                              *" << endl;
+	cout << "*  Movimentacao - Teclas WASD  *" << endl;
+	cout << "*    Pressione ESC para sair   *" << endl;
+	cout << "*                              *" << endl;
+	cout << "********************************";
+
 }
 //
 // FIM DA PARTE DE CÓDIGO ESCRITA POR CAIO
@@ -138,7 +232,7 @@ void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[], double temp
 	cout << endl;
 	cout << "Tempo ate o terremoto: " << (int)tempo << "   " << endl;
 	if (comida == 0)
-		cout << "Comida atual da formiga: nenhum\n\n";
+		cout << "Comida atual da formiga: nenhum \n\n";
 	else
 		cout << "Comida atual da formiga: " << comida << "         " << endl << endl;
 	cout << "Armazem 1 (BAIXO):\nP1: " << a1[0] << " | P2: " << a1[1] << " | P3: " << a1[2] << " | P4: " << a1[3] << endl << endl;
@@ -310,10 +404,11 @@ bool fimJogo()
 	return true;
 }
 
-bool venceuJogo()
+bool venceuJogo(bool tempo)
 {
 	system("cls");
 	cout << "VOCE VENCEU O JOGO, PARABENS!!!\n\n";
+	cout << "O tempo total foi: " << tempo << endl << endl;
 	system("pause");
 	return true;
 }
@@ -335,7 +430,7 @@ MATEUS:
 // PARTE DO CÓDIGO ESCRITA POR MATEUS
 //
 // função para medir tempo e sortear novo mapa 
-void medirTempo(bool inicio, int &mapa, clock_t &tempoInicial, clock_t &tempoFinal, double &tempoTotal)
+void medirTempo(bool inicio, int &mapa, clock_t &tempoInicial, clock_t &tempoFinal, double &tempoTotal, double &tempoExecucao)
 {
 	if (inicio)
 	{
@@ -345,6 +440,7 @@ void medirTempo(bool inicio, int &mapa, clock_t &tempoInicial, clock_t &tempoFin
 	{
 		tempoFinal = clock();
 		tempoTotal -= (tempoFinal - tempoInicial) / (double)CLOCKS_PER_SEC;
+		tempoExecucao -= (tempoFinal - tempoInicial) / (double)CLOCKS_PER_SEC;
 		if (tempoTotal < 0)
 		{
 			srand(time(NULL));
@@ -384,15 +480,17 @@ struct Armazem
 
 struct Controle
 {
-	bool menu = false,
+	bool menu = true,
 		 sair = false,
 		 fim = false,
-		 facil = true;
+		 facil = true, 
+		 opcaomenu = false;
 
 	clock_t tempoInicial = 0, 
 			tempoFinal = 0;
 
 	double tempoTotal = TEMPO_MAXIMO;
+	double tempoExecucao = 0;
 
 	int mapaAtual = 0;
 };
@@ -418,26 +516,28 @@ int main()
 
 	while (!controle.sair)
 	{
-		medirTempo(true, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal);
 		if (controle.menu)
 		{
-
+			menuSelect(controle.facil, controle.sair, controle.opcaomenu, controle.menu);
+			if (!controle.menu)
+				system("cls");
 		}
 		else
 		{
+			medirTempo(true, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal, controle.tempoExecucao);
 			imprimir(mapa[controle.mapaAtual].m, formiga.comidaAtual, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares, controle.tempoTotal);
 			lerComandos(mapa[controle.mapaAtual].m, controle.sair, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares, formiga.vazio, formiga.comidaAtual, controle.fim);
+			medirTempo(false, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal, controle.tempoExecucao);
 		}
 		mgotoxy(0, 0);
 		if (controle.fim)
 			controle.sair = fimJogo();
 		if (controle.facil)
 			if (venceuFacil(armazem[2].lugares))
-				controle.sair = venceuJogo();
+				controle.sair = venceuJogo(controle.tempoExecucao);
 		else
 			if (venceuDificil(armazem[2].lugares))
-				controle.sair = venceuJogo();
-		medirTempo(false, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal);
+				controle.sair = venceuJogo(controle.tempoExecucao);
 	}
 	return 0;
 }
