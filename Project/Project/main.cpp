@@ -22,59 +22,19 @@ void mgotoxy(int x, int y)
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), COORD{ static_cast<short>(x), static_cast<short>(y) });
 }
 
+
+
+
+
+/*---------------------------------------------------------------------------------------------------*/
+
+
+
+
+
 // PARTE DO CÓDIGO ESCRITA POR CAIO
 //
-// Nessa função a matriz é percorrida e os números são substituidos
-void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[])
-{
-	for (int i = 0; i < L; i++)
-	{
-		for (int j = 0; j < C; j++)
-		{
-			if (m[i][j] == 1)
-				cout << (char)178;
-			else if (m[i][j] == 0)
-				cout << " ";
-			else if (m[i][j] == 9)
-				cout << (char)667;
-			else if (m[i][j] == 10)
-				cout << "O";
-			else if (m[i][j] == 6)
-				cout << "1";
-			else if (m[i][j] == 7)
-				cout << "2";
-			else if (m[i][j] == 8)
-				cout << "3";
-			else if (m[i][j] == 5)
-				cout << (char)254;
-		}
-		cout << endl;
-	}
-	/*-------------- HUD -----------------*/
-	cout << endl << endl;
-	if (comida == 0)
-		cout << "Comida atual: nenhum\n\n";
-	else
-		cout << "Comida atual: " << comida << "           \n\n"; 
-	/*
-	Neste simples caso eu coloquei espaçoes depois 
-	da variável pois o programa não limpa a tela, mas sim 
-	sobrepõe os caracteres anteriores, então quando o valor 
-	da comida mudava, ficava sobrando uma parte do nenhum
-	(CARLOS).
-	*/
-	cout << "Armazem 1 (BAIXO):\nP1: " << a1[0] << " | P2: " << a1[1] << " | P3: " << a1[2] << " | P4: " << a1[3] << endl << endl;
-	cout << "Armazem 2  (MEIO):\nP1: " << a2[0] << " | P2: " << a2[1] << " | P3: " << a2[2] << " | P4: " << a2[3] << endl << endl;
-	cout << "Armazem 3  (CIMA):\nP1: " << a3[0] << " | P2: " << a3[1] << " | P3: " << a3[2] << " | P4: " << a3[3] << endl << endl;
-	/* 
-	O armazém está sem acento pois quando fui implementar
-	o setlocale, bugou os caracteres responsáveis pelo mapa
-	(CARLOS).
-	*/
-	/*------------------------------------*/
-}
-
-// Respon~sável por preencher as matrizes
+// Responsável por preencher as matrizes
 void preenchermapas(int m1[L][C], int m2[L][C], int m3[L][C])
 {
 	int mapa1[L][C] =
@@ -123,6 +83,48 @@ void preenchermapas(int m1[L][C], int m2[L][C], int m3[L][C])
 
 // PARTE DO CÓDIGO ESCRITA POR CARLOS
 //
+// Nessa função a matriz é percorrida e os números são substituidos
+void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[])
+{
+	for (int i = 0; i < L; i++)
+	{
+		for (int j = 0; j < C; j++)
+		{
+			if (m[i][j] == 1)
+				cout << (char)178;
+			else if (m[i][j] == 0)
+				cout << " ";
+			else if (m[i][j] == 9)
+				cout << (char)667;
+			else if (m[i][j] == 10)
+				cout << "O";
+			else if (m[i][j] == 6)
+				cout << "1";
+			else if (m[i][j] == 7)
+				cout << "2";
+			else if (m[i][j] == 8)
+				cout << "3";
+			else if (m[i][j] == 5)
+				cout << (char)254;
+		}
+		cout << endl;
+	}
+	/*-------------- HUD -----------------*/
+	cout << endl << endl;
+	if (comida == 0)
+		cout << "Comida atual: nenhum\n\n";
+	else
+		cout << "Comida atual da formiga: " << comida << endl << endl;
+	cout << "Armazem 1 (BAIXO):\nP1: " << a1[0] << " | P2: " << a1[1] << " | P3: " << a1[2] << " | P4: " << a1[3] << endl << endl;
+	cout << "Armazem 2  (MEIO):\nP1: " << a2[0] << " | P2: " << a2[1] << " | P3: " << a2[2] << " | P4: " << a2[3] << endl << endl;
+	cout << "Armazem 3  (CIMA):\nP1: " << a3[0] << " | P2: " << a3[1] << " | P3: " << a3[2] << " | P4: " << a3[3] << endl << endl;
+	/*
+	O armazém está sem acento pois quando fui implementar
+	o setlocale, bugou os caracteres responsáveis pelo mapa.
+	*/
+	/*------------------------------------*/
+}
+
 // Verifica se a formiga está ou não com comida
 void formigaatual(int m[L][C], int x, int y, bool vazio)
 {
@@ -144,7 +146,7 @@ void iniciararmazem(int comida[])
 }
 
 // Nessa função verifica-se se vai retirar ou colocar a comida no armazém
-void verificararmazem(int &comida, int local[], int m[L][C], int x, int y, bool &vazio)
+void verificararmazem(int &comida, int local[], int m[L][C], int x, int y, bool &vazio, bool &fim)
 {
 	int i;
 	bool s = false;
@@ -152,12 +154,15 @@ void verificararmazem(int &comida, int local[], int m[L][C], int x, int y, bool 
 	{
 		for (i = 3; i >= 0; i--)
 		{
+			a[i] = local[i];
+
 			if (local[i] != 0)
 			{
 				comida = local[i];
 				local[i] = 0;
 				m[x][y] = 10;
 				vazio = false;
+				i = -1;
 			}
 		}
 	}
@@ -169,8 +174,10 @@ void verificararmazem(int &comida, int local[], int m[L][C], int x, int y, bool 
 			{
 				if (i == 0)
 					s = true;
-				else if (comida < local[i-1])
+				else if (comida < local[i - 1])
 					s = true;
+				else if (comida > local[i - 1])
+					fim = true;
 
 				if (s)
 				{
@@ -179,13 +186,14 @@ void verificararmazem(int &comida, int local[], int m[L][C], int x, int y, bool 
 					m[x][y] = 9;
 					vazio = true;
 				}
+				i = 4;
 			}
 		}
 	}
 }
 
 // Nessa função são executados os comandos do jogo
-void lercomandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[], bool &vazio, int &comidaatualformiga)
+void lercomandos(int m[L][C], bool &sair, int local1[], int local2[], int local3[], bool &vazio, int &comidaatualformiga, bool &fim)
 {
 	static int x = 1, y = 1;
 	char tecla;
@@ -235,22 +243,22 @@ void lercomandos(int m[L][C], bool &sair, int local1[], int local2[], int local3
 			// se alguma posição ao redor da formiga for comida ela pega
 			if (m[x + 1][y] == 5 || m[x - 1][y] == 5 || m[x][y + 1] == 5 || m[x][y - 1] == 5   )
 			{
-				if (x > 12 && y < 3) // armazem 1 (inicial baixo)
+				if (x > 10 && y < 5) // armazem 1 (inicial baixo)
 				{
-					verificararmazem(comidaatualformiga, local1, m, x, y, vazio);
+					verificararmazem(comidaatualformiga, local1, m, x, y, vazio, fim);
 				}
-				if (x > 4 && x < 8 && y > 15 && y < 19) // armazem 2 (meio)
+				if (x > 5 && x < 10 && y > 14 && y < 20) // armazem 2 (meio)
 				{
-					verificararmazem(comidaatualformiga, local2, m, x, y, vazio);
+					verificararmazem(comidaatualformiga, local2, m, x, y, vazio, fim);
 				}
-				if (x < 4 && y > 28) // armazem 3 (cima)
+				if (x < 5 && y > 25) // armazem 3 (cima)
 				{
-					verificararmazem(comidaatualformiga, local3, m, x, y, vazio);
+					verificararmazem(comidaatualformiga, local3, m, x, y, vazio, fim);
 				}
 			}
 			break;
 		}
-		Sleep(50);
+		//Sleep(50);
 	}
 }
 //
@@ -309,7 +317,7 @@ void medirtempo(bool inicio, int &mapa)
 /*-------------------------------- STRUCTS ------------------------------------*/
 struct Formiga
 {
-	int comidaAtual = 0;
+	int comidaatual = 0;
 	bool vazio = true;
 };
 
@@ -320,34 +328,42 @@ struct Mapa
 
 struct Armazem
 {
-	int comida[4] = {0, 0, 0, 0};
+	int lugares[4] = {0, 0, 0, 0};
 };
 /*-----------------------------------------------------------------------------*/
 
 int main()
 {
 	/*-------------------------------- VARIÁVEIS ------------------------------*/
-	Formiga formiga;
 	Mapa mapa[3];
-	Armazem local[3]; // cada struct do vetor local representa um armazem no jogo
+	Armazem armazem[3]; // cada struct do vetor local representa um armazem no jogo
+	Formiga formiga;
 	int mapaatual = 0;
 	bool sair = false;
+	bool fim = false;
 	/*-------------------------------------------------------------------------*/
 
 	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
 	escondercursor();
 	preenchermapas(mapa[0].m, mapa[1].m, mapa[2].m);
-	iniciararmazem(local[0].comida);
-	//setlocale(LC_ALL, "Portuguese"); AO TENTAR USAR O SETLOCALE BUGOU TODOS OS CARACTERES DO MAPA
+	iniciararmazem(armazem[0].lugares);
+	//setlocale(LC_ALL, "Portuguese"); //AO TENTAR USAR O SETLOCALE BUGOU TODOS OS CARACTERES DO MAPA
 	/*-------------------------------------------------------------------------*/
 
 	while (!sair)
 	{
 		//medirtempo(true, mapaAtual);
-		imprimir(mapa[mapaatual].m, formiga.comidaAtual, local[0].comida, local[1].comida, local[2].comida);
-		lercomandos(mapa[mapaatual].m, sair, local[0].comida, local[1].comida, local[2].comida, formiga.vazio, formiga.comidaAtual);
+		imprimir(mapa[mapaatual].m, formiga.comidaatual, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares);
+		lercomandos(mapa[mapaatual].m, sair, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares, formiga.vazio, formiga.comidaatual, fim);
 		mgotoxy(0, 0);
 		//medirtempo(false, mapaAtual);
+		if (fim)
+		{
+			sair = true;
+			system("cls");
+			cout << "VOCE COLOCOU A COMIDA MAIOR EM CIMA DA MENOR E AGORA TODO MUNDO VAI MORRER DE FOME!!!\n\n";
+			system("pause");
+		}
 	}
 	return 0;
 }
