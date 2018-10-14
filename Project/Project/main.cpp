@@ -1,6 +1,5 @@
 /*
 DESCRIÇÃO: Jogo criado para a disciplina de Algoritmos e Programação, referente à A1M2.
-
 AUTORES: Carlos Eduardo de Bobra Machado;
 		 Caio Gonzaga Bernils;
 		 Mateus Luis Ropke Lauer.
@@ -13,15 +12,13 @@ AUTORES: Carlos Eduardo de Bobra Machado;
 #include <conio.h>
 #include <time.h>
 //
-// BIBLIOTECAS DO PROGRAMA
-//
 
-//
 // CONSTANTES
-
+//
 #define L 16
 #define C 32
 #define TEMPO_MAXIMO 45.0
+//
 
 using namespace std;
 
@@ -34,7 +31,7 @@ void esconderCursor()
 	SetConsoleCursorInfo(consoleHandle, &info);
 }
 
-void mgotoxy(int x, int y)
+void setarCursor(int x, int y)
 {
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), COORD{ static_cast<short>(x), static_cast<short>(y) });
 }
@@ -122,7 +119,7 @@ void preencherMapas(int m1[L][C], int m2[L][C], int m3[L][C])
 }
 
 //
-void menuSelect(bool &facil, bool &sair, bool &opcao, bool &menu) 
+void menu(bool &facil, bool &sair, bool &opcao, bool &menu)
 {
 	char tecla;
 
@@ -160,30 +157,27 @@ void menuSelect(bool &facil, bool &sair, bool &opcao, bool &menu)
 	cout << "********************************" << endl;
 	cout << "*                              *" << endl;
 	cout << "*                              *" << endl;
-	if (!opcao) {
+	if (!opcao)
 	cout << "*           * Facil *          *" << endl;
-	}
-	else {
+	else
 	cout << "*             Facil            *" << endl;
-	}
 	cout << "*                              *" << endl;
-	if (opcao) {
+	if (opcao)
 	cout << "*          * Dificil *         *" << endl;
-	}
-	else {
+	else
 	cout << "*            Dificil           *" << endl;
-	}
 	cout << "*                              *" << endl;
 	cout << "*                              *" << endl;
 	cout << "*          Instrucoes:         *" << endl;
 	cout << "*                              *" << endl;
-	cout << "* O deposito esta demoronando, *" << endl;
+	cout << "* O deposito esta desmoronando,*" << endl;
 	cout << "*    retire todas as comidas   *" << endl;
-	cout << "* do primeiro e leve para o 3. *" << endl;
+	cout << "*  do dep. 1 e leve para o 3.  *" << endl;
 	cout << "*  As comidas possuem tamanho, *" << endl;
 	cout << "*  as maiores sempre em baixo. *" << endl;
 	cout << "*                              *" << endl;
 	cout << "*  Movimentacao - Teclas WASD  *" << endl;
+	cout << "*     Pegar comida - Barra     *" << endl;
 	cout << "*    Pressione ESC para sair   *" << endl;
 	cout << "*                              *" << endl;
 	cout << "********************************";
@@ -267,7 +261,7 @@ void verificarArmazem(int &comida, int local[], int m[L][C], int x, int y, bool 
 {
 	int i;
 	bool s = false;
-	if (comida == 0)
+	if (comida == 0) // se a formiga não tiver comida, significa que ela vai pegar do armazém
 	{
 		for (i = 3; i >= 0; i--)
 		{
@@ -281,7 +275,7 @@ void verificarArmazem(int &comida, int local[], int m[L][C], int x, int y, bool 
 			}
 		}
 	}
-	else
+	else // se já tiver ela vai colocar no armazém
 	{
 		for (i = 0; i <= 3; i++)
 		{
@@ -319,7 +313,7 @@ void lerComandos(int m[L][C], bool &sair, int local1[], int local2[], int local3
 
 		switch (tecla)
 		{
-		case 'w': //cima
+		case 'w': // cima
 			if (m[x - 1][y] == 0)
 			{
 				m[x][y] = 0;
@@ -327,7 +321,7 @@ void lerComandos(int m[L][C], bool &sair, int local1[], int local2[], int local3
 				formigaAtual(m, x, y, vazio);
 			}
 			break;
-		case 's': //baixo
+		case 's': // baixo
 			if (m[x + 1][y] == 0)
 			{
 				m[x][y] = 0;
@@ -335,7 +329,7 @@ void lerComandos(int m[L][C], bool &sair, int local1[], int local2[], int local3
 				formigaAtual(m, x, y, vazio);
 			}
 			break;
-		case 'a': //esquerda
+		case 'a': // esquerda
 			if (m[x][y - 1] == 0)
 			{
 				m[x][y] = 0;
@@ -343,7 +337,7 @@ void lerComandos(int m[L][C], bool &sair, int local1[], int local2[], int local3
 				formigaAtual(m, x, y, vazio);
 			}
 			break;
-		case 'd': //direita
+		case 'd': // direita
 			if (m[x][y + 1] == 0)
 			{
 				m[x][y] = 0;
@@ -356,7 +350,7 @@ void lerComandos(int m[L][C], bool &sair, int local1[], int local2[], int local3
 			break;
 		case 32:  // pega ou deposita comida
 			// se alguma posição ao redor da formiga for comida ela pega
-			if (m[x + 1][y] == 5 || m[x - 1][y] == 5 || m[x][y + 1] == 5 || m[x][y - 1] == 5   )
+			if (m[x + 1][y] == 5 || m[x - 1][y] == 5 || m[x][y + 1] == 5 || m[x][y - 1] == 5)
 			{
 				if (x > 10 && y < 5) // armazem 1 (inicial baixo)
 				{
@@ -422,11 +416,6 @@ bool venceuJogo(bool tempo)
 
 
 
-/*
-MATEUS:
-	- Criar uma função/método que realize a troca do mapa;
-	- Criar uma variável para mostrar o cronometro na tela.
-*/
 // PARTE DO CÓDIGO ESCRITA POR MATEUS
 //
 // função para medir tempo e sortear novo mapa 
@@ -475,7 +464,7 @@ struct Mapa
 
 struct Armazem
 {
-	int lugares[4] = {0, 0, 0, 0};
+	int lugares[4] = { 0, 0, 0, 0 };
 };
 
 struct Controle
@@ -483,10 +472,10 @@ struct Controle
 	bool menu = true,
 		 sair = false,
 		 fim = false,
-		 facil = true, 
+		 facil = true,
 		 opcaomenu = false;
 
-	clock_t tempoInicial = 0, 
+	clock_t tempoInicial = 0,
 			tempoFinal = 0;
 
 	double tempoTotal = TEMPO_MAXIMO;
@@ -500,7 +489,7 @@ int main()
 {
 	/*-------------------------------- VARIÁVEIS ------------------------------*/
 	Mapa mapa[3];
-	Armazem armazem[3]; // cada struct do vetor representa um armazem no jogo
+	Armazem armazem[3];
 	Formiga formiga;
 	Controle controle;
 	/*-------------------------------------------------------------------------*/
@@ -518,7 +507,7 @@ int main()
 	{
 		if (controle.menu)
 		{
-			menuSelect(controle.facil, controle.sair, controle.opcaomenu, controle.menu);
+			menu(controle.facil, controle.sair, controle.opcaomenu, controle.menu);
 			if (!controle.menu)
 				system("cls");
 		}
@@ -529,15 +518,19 @@ int main()
 			lerComandos(mapa[controle.mapaAtual].m, controle.sair, armazem[0].lugares, armazem[1].lugares, armazem[2].lugares, formiga.vazio, formiga.comidaAtual, controle.fim);
 			medirTempo(false, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal, controle.tempoExecucao);
 		}
-		mgotoxy(0, 0);
+		setarCursor(0, 0);
 		if (controle.fim)
 			controle.sair = fimJogo();
 		if (controle.facil)
+		{
 			if (venceuFacil(armazem[2].lugares))
 				controle.sair = venceuJogo(controle.tempoExecucao);
+		}
 		else
+		{
 			if (venceuDificil(armazem[2].lugares))
 				controle.sair = venceuJogo(controle.tempoExecucao);
+		}
 	}
 	return 0;
 }
