@@ -223,7 +223,7 @@ void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[], double temp
 		cout << endl;
 	}
 
-	/*-------------- HUD -----------------*/
+	/*---------------------------- HUD -------------------------------*/
 
 	cout << endl;
 	cout << "Tempo ate o terremoto: " << (int)tempo << "   " << endl;
@@ -235,7 +235,7 @@ void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[], double temp
 	cout << "Armazem 2  (MEIO):\nP1: " << a2[0] << " | P2: " << a2[1] << " | P3: " << a2[2] << " | P4: " << a2[3] << endl << endl;
 	cout << "Armazem 3  (CIMA):\nP1: " << a3[0] << " | P2: " << a3[1] << " | P3: " << a3[2] << " | P4: " << a3[3] << endl << endl;
 
-	/*------------------------------------*/
+	/*----------------------------------------------------------------*/
 }
 
 // Verifica se a formiga está ou não com comida
