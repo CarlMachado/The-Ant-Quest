@@ -118,9 +118,10 @@ void preencherMapas(int m1[L][C], int m2[L][C], int m3[L][C])
 	}
 }
 
-//
-void menu(bool &facil, bool &sair, bool &opcao, bool &menu)
+// Apresenta a tela de menu ao jogador
+void menu(bool &facil, bool &sair, bool &menu)
 {
+	static bool opcao = false;
 	char tecla;
 
 	if (_kbhit())
@@ -144,7 +145,7 @@ void menu(bool &facil, bool &sair, bool &opcao, bool &menu)
 		case 27: // sair
 			sair = true;
 			break;
-		case 32:
+		case 32: // seleciona
 			if (opcao)
 				facil = false;
 			else
@@ -153,6 +154,7 @@ void menu(bool &facil, bool &sair, bool &opcao, bool &menu)
 			break;
 		}
 	}
+	//----------------- MENU --------------------- //
 
 	cout << "********************************" << endl;
 	cout << "*                              *" << endl;
@@ -181,7 +183,7 @@ void menu(bool &facil, bool &sair, bool &opcao, bool &menu)
 	cout << "*    Pressione ESC para sair   *" << endl;
 	cout << "*                              *" << endl;
 	cout << "********************************";
-
+	//-------------------------------------------- //
 }
 //
 // FIM DA PARTE DE CÓDIGO ESCRITA POR CAIO
@@ -201,21 +203,21 @@ void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[], double temp
 	{
 		for (int j = 0; j < C; j++)
 		{
-			if (m[i][j] == 1)
+			if (m[i][j] == 1)        // parede
 				cout << (char)178;
-			else if (m[i][j] == 0)
+			else if (m[i][j] == 0)   // caminho
 				cout << " ";
-			else if (m[i][j] == 9)
+			else if (m[i][j] == 9)   // personagem vazio
 				cout << (char)667;
-			else if (m[i][j] == 10)
+			else if (m[i][j] == 10)  // personagem cheio
 				cout << "O";
-			else if (m[i][j] == 6)
+			else if (m[i][j] == 6)   // armazém 1
 				cout << "1";
-			else if (m[i][j] == 7)
+			else if (m[i][j] == 7)   // armazém 2
 				cout << "2";
-			else if (m[i][j] == 8)
+			else if (m[i][j] == 8)   // armazém 3
 				cout << "3";
-			else if (m[i][j] == 5)
+			else if (m[i][j] == 5)   // local de comida
 				cout << (char)254;
 		}
 		cout << endl;
@@ -226,7 +228,7 @@ void imprimir(int m[L][C], int comida, int a1[], int a2[], int a3[], double temp
 	cout << endl;
 	cout << "Tempo ate o terremoto: " << (int)tempo << "   " << endl;
 	if (comida == 0)
-		cout << "Comida atual da formiga: nenhum \n\n";
+		cout << "Comida atual da formiga: nenhuma \n\n";
 	else
 		cout << "Comida atual da formiga: " << comida << "         " << endl << endl;
 	cout << "Armazem 1 (BAIXO):\nP1: " << a1[0] << " | P2: " << a1[1] << " | P3: " << a1[2] << " | P4: " << a1[3] << endl << endl;
@@ -449,7 +451,6 @@ void medirTempo(bool inicio, int &mapa, clock_t &tempoInicial, clock_t &tempoFin
 
 // TANTO A FUNÇÃO MAIN COMO SUAS VARIÁVEIS FORAM MANIPULADAS POR TODO O GRUPO
 //
-
 /*-------------------------------- STRUCTS ------------------------------------*/
 struct Formiga
 {
@@ -469,18 +470,14 @@ struct Armazem
 
 struct Controle
 {
-	bool menu = true,
-		 sair = false,
-		 fim = false,
-		 facil = true,
-		 opcaomenu = false;
-
+	bool menu  = true,
+		 sair  = false,
+		 fim   = false,
+		 facil = true;
 	clock_t tempoInicial = 0,
-			tempoFinal = 0;
-
-	double tempoTotal = TEMPO_MAXIMO;
-	double tempoExecucao = 0;
-
+			tempoFinal   = 0;
+	double tempoTotal    = TEMPO_MAXIMO,
+		   tempoExecucao = 0;
 	int mapaAtual = 0;
 };
 /*-----------------------------------------------------------------------------*/
@@ -503,11 +500,12 @@ int main()
 	//POR ISSO AS PALAVRAS ESTÃO SEM ACENTO
 	/*-------------------------------------------------------------------------*/
 
+	/*------------------------------ LOOP PRINCIPAL ---------------------------*/
 	while (!controle.sair)
 	{
 		if (controle.menu)
 		{
-			menu(controle.facil, controle.sair, controle.opcaomenu, controle.menu);
+			menu(controle.facil, controle.sair, controle.menu);
 			if (!controle.menu)
 				system("cls");
 		}
@@ -521,17 +519,12 @@ int main()
 		setarCursor(0, 0);
 		if (controle.fim)
 			controle.sair = fimJogo();
-		if (controle.facil)
-		{
-			if (venceuFacil(armazem[2].lugares))
-				controle.sair = venceuJogo(controle.tempoExecucao);
-		}
-		else
-		{
-			if (venceuDificil(armazem[2].lugares))
-				controle.sair = venceuJogo(controle.tempoExecucao);
-		}
+		if (controle.facil && venceuFacil(armazem[2].lugares))
+			controle.sair = venceuJogo(controle.tempoExecucao);
+		else if (!controle.facil && venceuDificil(armazem[2].lugares))
+			controle.sair = venceuJogo(controle.tempoExecucao);
 	}
+	/*-------------------------------------------------------------------------*/
 	return 0;
 }
 //
