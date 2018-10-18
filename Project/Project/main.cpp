@@ -1,6 +1,6 @@
 /*
 DESCRIÇÃO: Jogo criado para a disciplina de Algoritmos e Programação, referente à A1M2.
-AUTORES: Carlos Eduardo de Bobra Machado;
+AUTORES: Carlos Eduardo de Borba Machado;
 		 Caio Gonzaga Bernils;
 		 Mateus Luis Ropke Lauer.
 */
@@ -22,7 +22,7 @@ AUTORES: Carlos Eduardo de Bobra Machado;
 
 using namespace std;
 
-void esconderCursor()
+void esconderCursor(void)
 {
 	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO info;
@@ -279,7 +279,7 @@ void verificarArmazem(int &comida, int local[3][4], int a, int m[L][C], int x, i
 	{
 		for (i = 3; i >= 0; i--)
 		{
-			if (local[i] != 0)
+			if (local[a][i] != 0)
 			{
 				comida = local[a][i];
 				local[a][i] = 0;
@@ -381,11 +381,11 @@ void lerComandos(int m[L][C], bool &sair, int local[3][4], bool &vazio, int &com
 			}
 			break;
 		}
-		Sleep(50);
+		//Sleep(50);
 	}
 }
 
-// Verificam de o jogador venceu
+// Verificam se o jogador venceu
 bool venceuDificil(int a[3][4])
 {
 	int i;
@@ -405,7 +405,7 @@ bool venceuFacil(int a[3][4])
 //-------------------------------
 
 // Mostram a tela de Game Over
-bool fimJogo()
+bool fimJogo(void)
 {
 	system("cls");
 	cout << "VOCE COLOCOU A COMIDA MAIOR EM CIMA DA MENOR E AGORA TODO MUNDO VAI MORRER DE FOME!!!\n\n";
@@ -490,7 +490,7 @@ struct Controle
 };
 /*-----------------------------------------------------------------------------*/
 
-int main()
+int main(void)
 {
 	/*-------------------------------- VARIÁVEIS ------------------------------*/
 	Mapa mapa[3];
