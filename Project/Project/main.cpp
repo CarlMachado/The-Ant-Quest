@@ -1,8 +1,13 @@
 /*
-DESCRIÇÃO: Jogo criado para a disciplina de Algoritmos e Programação, referente à A1M2.
-AUTORES: Carlos Eduardo de Borba Machado;
-		 Caio Gonzaga Bernils;
-		 Mateus Luis Ropke Lauer.
+
+	DESCRIÇÃO: Jogo criado para a disciplina de Algoritmos e Programação, referente à A1M2.
+
+	AUTORES:
+
+		Carlos Eduardo de Borba Machado;
+		Caio Gonzaga Bernils;
+		Mateus Luis Ropke Lauer.
+
 */
 
 // BIBLIOTECAS
@@ -23,6 +28,15 @@ AUTORES: Carlos Eduardo de Borba Machado;
 using namespace std;
 
 /*-------------------------------- STRUCTS ------------------------------------*/
+
+typedef struct Controle
+{
+	bool menu = true, facil = true, fim = false, sair = false;
+	clock_t tempoInicial = 0, tempoFinal = 0;
+	double tempoTotal = TEMPO_MAXIMO, tempoExecucao = 0;
+	int mapaAtual = 0;
+};
+
 typedef struct Formiga
 {
 	int comidaAtual = 0;
@@ -35,21 +49,6 @@ typedef struct Mapa
 	int m[L][C];
 };
 
-typedef struct Controle
-{
-	bool menu  = true,
-		 facil = true,
-		 fim   = false,
-		 sair  = false;
-
-	clock_t tempoInicial = 0,
-			tempoFinal   = 0;
-
-	double tempoTotal    = TEMPO_MAXIMO,
-		   tempoExecucao = 0;
-
-	int mapaAtual = 0;
-};
 /*-----------------------------------------------------------------------------*/
 
 // Oculta o cursor do console
@@ -225,48 +224,6 @@ void menu(Controle &c)
 
 // PARTE DO CÓDIGO ESCRITA POR CARLOS
 //
-// Nessa função a matriz é percorrida e os números são substituidos
-void imprimir(int m[L][C], int a[3][4], Controle c, Formiga f)
-{
-	for (int i = 0; i < L; i++)
-	{
-		for (int j = 0; j < C; j++)
-		{
-			if (m[i][j] == 1)        // parede
-				cout << (char)178;
-			else if (m[i][j] == 0)   // caminho
-				cout << " ";
-			else if (m[i][j] == 9)   // personagem vazio
-				cout << (char)667;
-			else if (m[i][j] == 10)  // personagem cheio
-				cout << "O";
-			else if (m[i][j] == 6)   // armazém 1
-				cout << "1";
-			else if (m[i][j] == 7)   // armazém 2
-				cout << "2";
-			else if (m[i][j] == 8)   // armazém 3
-				cout << "3";
-			else if (m[i][j] == 5)   // local de comida
-				cout << (char)254;
-		}
-		cout << endl;
-	}
-
-	/*---------------------------- HUD -------------------------------*/
-
-	cout << endl;
-	cout << "Tempo ate o terremoto: " << (int)c.tempoTotal << "   " << endl;
-	if (f.comidaAtual == 0)
-		cout << "Comida atual da formiga: nenhuma \n\n";
-	else
-		cout << "Comida atual da formiga: " << f.comidaAtual << "         " << endl << endl;
-	cout << "Armazem 1 (BAIXO):\nP1: " << a[0][0] << " | P2: " << a[0][1] << " | P3: " << a[0][2] << " | P4: " << a[0][3] << endl << endl;
-	cout << "Armazem 2  (MEIO):\nP1: " << a[1][0] << " | P2: " << a[1][1] << " | P3: " << a[1][2] << " | P4: " << a[1][3] << endl << endl;
-	cout << "Armazem 3  (CIMA):\nP1: " << a[2][0] << " | P2: " << a[2][1] << " | P3: " << a[2][2] << " | P4: " << a[2][3] << endl << endl;
-
-	/*----------------------------------------------------------------*/
-}
-
 // Verifica se a formiga está ou não com comida
 void formigaAtual(int m[L][C], Formiga f)
 {
@@ -391,7 +348,7 @@ void lerComandos(int m[L][C], int armazem[3][4], Controle &c, Formiga &f)
 			c.sair = true;
 			break;
 		case 32:  // pega ou deposita comida
-			// se alguma posição ao redor da formiga for comida ela pega
+				  // se alguma posição ao redor da formiga for comida ela pega
 			if (m[f.x + 1][f.y] == 5 || m[f.x - 1][f.y] == 5 || m[f.x][f.y + 1] == 5 || m[f.x][f.y - 1] == 5)
 			{
 				if (f.x > 10 && f.y < 5) // armazem 1 (inicial baixo)
@@ -405,6 +362,48 @@ void lerComandos(int m[L][C], int armazem[3][4], Controle &c, Formiga &f)
 		}
 		Sleep(50);
 	}
+}
+
+// Nessa função a matriz é percorrida e os números são substituidos
+void imprimir(int m[L][C], int a[3][4], Controle c, Formiga f)
+{
+	for (int i = 0; i < L; i++)
+	{
+		for (int j = 0; j < C; j++)
+		{
+			if (m[i][j] == 1)        // parede
+				cout << (char)178;
+			else if (m[i][j] == 0)   // caminho
+				cout << " ";
+			else if (m[i][j] == 9)   // personagem vazio
+				cout << (char)667;
+			else if (m[i][j] == 10)  // personagem cheio
+				cout << "O";
+			else if (m[i][j] == 6)   // armazém 1
+				cout << "1";
+			else if (m[i][j] == 7)   // armazém 2
+				cout << "2";
+			else if (m[i][j] == 8)   // armazém 3
+				cout << "3";
+			else if (m[i][j] == 5)   // local de comida
+				cout << (char)254;
+		}
+		cout << endl;
+	}
+
+	/*---------------------------- HUD -------------------------------*/
+
+	cout << endl;
+	cout << "Tempo ate o terremoto: " << (int)c.tempoTotal << "   " << endl;
+	if (f.comidaAtual == 0)
+		cout << "Comida atual da formiga: nenhuma \n\n";
+	else
+		cout << "Comida atual da formiga: " << f.comidaAtual << "         " << endl << endl;
+	cout << "Armazem 1 (BAIXO):\nP1: " << a[0][0] << " | P2: " << a[0][1] << " | P3: " << a[0][2] << " | P4: " << a[0][3] << endl << endl;
+	cout << "Armazem 2  (MEIO):\nP1: " << a[1][0] << " | P2: " << a[1][1] << " | P3: " << a[1][2] << " | P4: " << a[1][3] << endl << endl;
+	cout << "Armazem 3  (CIMA):\nP1: " << a[2][0] << " | P2: " << a[2][1] << " | P3: " << a[2][2] << " | P4: " << a[2][3] << endl << endl;
+
+	/*----------------------------------------------------------------*/
 }
 
 // Verificam se o jogador venceu
@@ -435,7 +434,7 @@ bool fimJogo(void)
 	return true;
 }
 
-bool venceuJogo(bool tempo)
+bool venceuJogo(double tempo)
 {
 	system("cls");
 	cout << "VOCE VENCEU O JOGO, PARABENS!!!\n\n";
@@ -497,11 +496,12 @@ void medirTempo(bool inicio, Controle &c, Mapa m[], Formiga &f)
 		c.tempoFinal = clock();
 		c.tempoTotal -= (c.tempoFinal - c.tempoInicial) / (double)CLOCKS_PER_SEC;
 		c.tempoExecucao -= (c.tempoFinal - c.tempoInicial) / (double)CLOCKS_PER_SEC;
+
 		if (c.tempoTotal < 0)
 		{
-			for (int i = 0; i < L; i++) 
+			for (int i = 0; i < L; i++)
 			{
-				for (int j = 0; j < C; j++) 
+				for (int j = 0; j < C; j++)
 				{
 					if (m[c.mapaAtual].m[i][j] == 9)
 						m[c.mapaAtual].m[i][j] = 0;
@@ -509,6 +509,7 @@ void medirTempo(bool inicio, Controle &c, Mapa m[], Formiga &f)
 						m[c.mapaAtual].m[i][j] = 0;
 				}
 			}
+
 			srand(time(NULL));
 
 			while (c.mapaAtual == aux)
