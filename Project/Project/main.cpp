@@ -17,13 +17,13 @@ AUTORES: Carlos Eduardo de Borba Machado;
 //
 #define L 16
 #define C 32
-#define TEMPO_MAXIMO 4.0
+#define TEMPO_MAXIMO 45.0
 //
 
 using namespace std;
 
 /*-------------------------------- STRUCTS ------------------------------------*/
-struct Formiga
+typedef struct Formiga
 {
 	int comidaAtual = 0;
 	bool vazio = true;
@@ -34,7 +34,7 @@ typedef struct Mapa
 	int m[L][C];
 };
 
-struct Controle
+typedef struct Controle
 {
 	bool menu  = true,
 		 facil = true,
@@ -225,7 +225,7 @@ void menu(bool &facil, bool &sair, bool &menu)
 // PARTE DO CÓDIGO ESCRITA POR CARLOS
 //
 // Nessa função a matriz é percorrida e os números são substituidos
-void imprimir(int m[L][C], int comida, int a[3][4], double tempo)
+void imprimir(int m[L][C], int a[3][4], Controle c, Formiga f)
 {
 	for (int i = 0; i < L; i++)
 	{
@@ -254,11 +254,11 @@ void imprimir(int m[L][C], int comida, int a[3][4], double tempo)
 	/*---------------------------- HUD -------------------------------*/
 
 	cout << endl;
-	cout << "Tempo ate o terremoto: " << (int)tempo << "   " << endl;
-	if (comida == 0)
+	cout << "Tempo ate o terremoto: " << (int)c.tempoTotal << "   " << endl;
+	if (f.comidaAtual == 0)
 		cout << "Comida atual da formiga: nenhuma \n\n";
 	else
-		cout << "Comida atual da formiga: " << comida << "         " << endl << endl;
+		cout << "Comida atual da formiga: " << f.comidaAtual << "         " << endl << endl;
 	cout << "Armazem 1 (BAIXO):\nP1: " << a[0][0] << " | P2: " << a[0][1] << " | P3: " << a[0][2] << " | P4: " << a[0][3] << endl << endl;
 	cout << "Armazem 2  (MEIO):\nP1: " << a[1][0] << " | P2: " << a[1][1] << " | P3: " << a[1][2] << " | P4: " << a[1][3] << endl << endl;
 	cout << "Armazem 3  (CIMA):\nP1: " << a[2][0] << " | P2: " << a[2][1] << " | P3: " << a[2][2] << " | P4: " << a[2][3] << endl << endl;
@@ -344,7 +344,7 @@ void verificarArmazem(int &comida, int local[3][4], int a, int m[L][C], int x, i
 }
 
 // Nessa função são executados os comandos do jogo
-void lerComandos(int m[L][C], bool &sair, int local[3][4], bool &vazio, int &comidaAtualFormiga, bool &fim, int &x, int &y)
+void lerComandos(int m[L][C], int armazem[3][4], Formiga &f, Controle &c, int &x, int &y)
 {
 	char tecla;
 
@@ -359,7 +359,7 @@ void lerComandos(int m[L][C], bool &sair, int local[3][4], bool &vazio, int &com
 			{
 				m[x][y] = 0;
 				x--;
-				formigaAtual(m, x, y, vazio);
+				formigaAtual(m, x, y, f.vazio);
 			}
 			break;
 		case 's': // baixo
@@ -367,7 +367,7 @@ void lerComandos(int m[L][C], bool &sair, int local[3][4], bool &vazio, int &com
 			{
 				m[x][y] = 0;
 				x++;
-				formigaAtual(m, x, y, vazio);
+				formigaAtual(m, x, y, f.vazio);
 			}
 			break;
 		case 'a': // esquerda
@@ -375,7 +375,7 @@ void lerComandos(int m[L][C], bool &sair, int local[3][4], bool &vazio, int &com
 			{
 				m[x][y] = 0;
 				y--;
-				formigaAtual(m, x, y, vazio);
+				formigaAtual(m, x, y, f.vazio);
 			}
 			break;
 		case 'd': // direita
@@ -383,22 +383,22 @@ void lerComandos(int m[L][C], bool &sair, int local[3][4], bool &vazio, int &com
 			{
 				m[x][y] = 0;
 				y++;
-				formigaAtual(m, x, y, vazio);
+				formigaAtual(m, x, y, f.vazio);
 			}
 			break;
 		case 27: // sair
-			sair = true;
+			c.sair = true;
 			break;
 		case 32:  // pega ou deposita comida
 			// se alguma posição ao redor da formiga for comida ela pega
 			if (m[x + 1][y] == 5 || m[x - 1][y] == 5 || m[x][y + 1] == 5 || m[x][y - 1] == 5)
 			{
 				if (x > 10 && y < 5) // armazem 1 (inicial baixo)
-					verificarArmazem(comidaAtualFormiga, local, 0, m, x, y, vazio, fim);
+					verificarArmazem(f.comidaAtual, armazem, 0, m, x, y, f.vazio, c.fim);
 				if (x > 5 && x < 10 && y > 14 && y < 20) // armazem 2 (meio)
-					verificarArmazem(comidaAtualFormiga, local, 1, m, x, y, vazio, fim);
+					verificarArmazem(f.comidaAtual, armazem, 1, m, x, y, f.vazio, c.fim);
 				if (x < 5 && y > 25) // armazem 3 (cima final)
-					verificarArmazem(comidaAtualFormiga, local, 2, m, x, y, vazio, fim);
+					verificarArmazem(f.comidaAtual, armazem, 2, m, x, y, f.vazio, c.fim);
 			}
 			break;
 		}
@@ -455,72 +455,72 @@ bool venceuJogo(bool tempo)
 // PARTE DO CÓDIGO ESCRITA POR MATEUS
 //
 // função para medir tempo e sortear novo mapa 
-void medirTempo(bool inicio, int &mapa, clock_t &tempoInicial, clock_t &tempoFinal, double &tempoTotal, double &tempoExecucao, Mapa m[], int &x, int &y)
+void medirTempo(bool inicio, Controle &c, Mapa m[], int &x, int &y)
 {
-	int aux = mapa;
+	int aux = c.mapaAtual;
 	bool carregando = false;
 	if (inicio)
 	{
-		tempoInicial = clock();
+		c.tempoInicial = clock();
 	}
 	else
 	{
-		tempoFinal = clock();
-		tempoTotal -= (tempoFinal - tempoInicial) / (double)CLOCKS_PER_SEC;
-		tempoExecucao -= (tempoFinal - tempoInicial) / (double)CLOCKS_PER_SEC;
-		if (tempoTotal < 0)
+		c.tempoFinal = clock();
+		c.tempoTotal -= (c.tempoFinal - c.tempoInicial) / (double)CLOCKS_PER_SEC;
+		c.tempoExecucao -= (c.tempoFinal - c.tempoInicial) / (double)CLOCKS_PER_SEC;
+		if (c.tempoTotal < 0)
 		{
 			for (int i = 0; i < L; i++) 
 			{
 				for (int j = 0; j < C; j++) 
 				{
-					if (m[mapa].m[i][j] == 9) 
+					if (m[c.mapaAtual].m[i][j] == 9)
 					{
 						x = i;
 						y = j;
-						m[mapa].m[i][j] = 0;
+						m[c.mapaAtual].m[i][j] = 0;
 						carregando = false;
 					}
-					if (m[mapa].m[i][j] == 10) 
+					if (m[c.mapaAtual].m[i][j] == 10)
 					{
 						x = i;
 						y = j;
-						m[mapa].m[i][j] = 0;
+						m[c.mapaAtual].m[i][j] = 0;
 						carregando = true;
 					}
 				}
 			}
 			srand(time(NULL));
 
-			mapa = rand() % 3;
+			c.mapaAtual = rand() % 3;
 
-			tempoTotal = TEMPO_MAXIMO;
+			c.tempoTotal = TEMPO_MAXIMO;
 
 			if (carregando) 
 			{
-				if (m[mapa].m[x][y] == 0)
-					m[mapa].m[x][y] = 10;
-				else if (m[mapa].m[x + 1][y] == 0)
-					m[mapa].m[x + 1][y] = 10;
-				else if (m[mapa].m[x - 1][y] == 0)
-					m[mapa].m[x - 1][y] = 10;
-				else if (m[mapa].m[x][y + 1] == 0)
-					m[mapa].m[x][y + 1] = 10;
-				else if (m[mapa].m[x][y - 1] == 0)
-					m[mapa].m[x][y - 1] = 10;
+				if (m[c.mapaAtual].m[x][y] == 0)
+					m[c.mapaAtual].m[x][y] = 10;
+				else if (m[c.mapaAtual].m[x + 1][y] == 0)
+					m[c.mapaAtual].m[x + 1][y] = 10;
+				else if (m[c.mapaAtual].m[x - 1][y] == 0)
+					m[c.mapaAtual].m[x - 1][y] = 10;
+				else if (m[c.mapaAtual].m[x][y + 1] == 0)
+					m[c.mapaAtual].m[x][y + 1] = 10;
+				else if (m[c.mapaAtual].m[x][y - 1] == 0)
+					m[c.mapaAtual].m[x][y - 1] = 10;
 			}
 			else 
 			{
-				if (m[mapa].m[x][y] == 0)
-					m[mapa].m[x][y] = 9;
-				else if (m[mapa].m[x + 1][y] == 0)
-					m[mapa].m[x + 1][y] = 9;
-				else if (m[mapa].m[x - 1][y] == 0)
-					m[mapa].m[x - 1][y] = 9;
-				else if (m[mapa].m[x][y + 1] == 0)
-					m[mapa].m[x][y + 1] = 9;
-				else if (m[mapa].m[x][y - 1] == 0)
-					m[mapa].m[x][y - 1] = 9;
+				if (m[c.mapaAtual].m[x][y] == 0)
+					m[c.mapaAtual].m[x][y] = 9;
+				else if (m[c.mapaAtual].m[x + 1][y] == 0)
+					m[c.mapaAtual].m[x + 1][y] = 9;
+				else if (m[c.mapaAtual].m[x - 1][y] == 0)
+					m[c.mapaAtual].m[x - 1][y] = 9;
+				else if (m[c.mapaAtual].m[x][y + 1] == 0)
+					m[c.mapaAtual].m[x][y + 1] = 9;
+				else if (m[c.mapaAtual].m[x][y - 1] == 0)
+					m[c.mapaAtual].m[x][y - 1] = 9;
 			}
 		}
 	}
@@ -566,10 +566,10 @@ int main(void)
 		}
 		else
 		{
-			medirTempo(true, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal, controle.tempoExecucao, mapa, x, y);
-			imprimir(mapa[controle.mapaAtual].m, formiga.comidaAtual, armazem, controle.tempoTotal);
-			lerComandos(mapa[controle.mapaAtual].m, controle.sair, armazem, formiga.vazio, formiga.comidaAtual, controle.fim, x, y);
-			medirTempo(false, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal, controle.tempoExecucao, mapa, x, y);
+			medirTempo(true, controle, mapa, x, y);
+			imprimir(mapa[controle.mapaAtual].m, formiga, armazem, controle);
+			lerComandos(mapa[controle.mapaAtual].m, armazem, formiga, controle, x, y);
+			medirTempo(false, controle, mapa, x, y);
 		}
 		setarCursor(0, 0);
 		if (controle.fim)
