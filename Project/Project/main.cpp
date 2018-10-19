@@ -5,7 +5,7 @@ AUTORES: Carlos Eduardo de Borba Machado;
 		 Mateus Luis Ropke Lauer.
 */
 
-// BIBLIOTECAS DO SISTEMA
+// BIBLIOTECAS
 //
 #include <iostream>
 #include <windows.h>
