@@ -455,6 +455,34 @@ bool venceuJogo(bool tempo)
 
 // PARTE DO CÓDIGO ESCRITA POR MATEUS
 //
+// Muda a posição da formiga para não ser soterrada
+void mudarPosicao(Formiga &f, Mapa m[], Controle c, int a)
+{
+	if (m[c.mapaAtual].m[f.x][f.y] == 0)
+	{
+		m[c.mapaAtual].m[f.x][f.y] = a;
+	}
+	else if (m[c.mapaAtual].m[f.x + 1][f.y] == 0)
+	{
+		m[c.mapaAtual].m[f.x + 1][f.y] = a;
+		f.x++;
+	}
+	else if (m[c.mapaAtual].m[f.x - 1][f.y] == 0)
+	{
+		m[c.mapaAtual].m[f.x - 1][f.y] = a;
+		f.x--;
+	}
+	else if (m[c.mapaAtual].m[f.x][f.y + 1] == 0)
+	{
+		m[c.mapaAtual].m[f.x][f.y + 1] = a;
+		f.y++;
+	}
+	else if (m[c.mapaAtual].m[f.x][f.y - 1] == 0)
+	{
+		m[c.mapaAtual].m[f.x][f.y - 1] = a;
+		f.y--;
+	}
+}
 // função para medir tempo e sortear novo mapa 
 void medirTempo(bool inicio, Controle &c, Mapa m[], Formiga &f)
 {
@@ -464,6 +492,8 @@ void medirTempo(bool inicio, Controle &c, Mapa m[], Formiga &f)
 	}
 	else
 	{
+		int aux = c.mapaAtual;
+
 		c.tempoFinal = clock();
 		c.tempoTotal -= (c.tempoFinal - c.tempoInicial) / (double)CLOCKS_PER_SEC;
 		c.tempoExecucao -= (c.tempoFinal - c.tempoInicial) / (double)CLOCKS_PER_SEC;
@@ -474,51 +504,22 @@ void medirTempo(bool inicio, Controle &c, Mapa m[], Formiga &f)
 				for (int j = 0; j < C; j++) 
 				{
 					if (m[c.mapaAtual].m[i][j] == 9)
-					{
-						f.x = i;
-						f.y = j;
 						m[c.mapaAtual].m[i][j] = 0;
-					}
 					if (m[c.mapaAtual].m[i][j] == 10)
-					{
-						f.x = i;
-						f.y = j;
 						m[c.mapaAtual].m[i][j] = 0;
-					}
 				}
 			}
 			srand(time(NULL));
 
-			c.mapaAtual = rand() % 3;
+			while (c.mapaAtual == aux)
+				c.mapaAtual = rand() % 3;
 
 			c.tempoTotal = TEMPO_MAXIMO;
 
-			if (!f.vazio) 
-			{
-				if (m[c.mapaAtual].m[f.x][f.y] == 0)
-					m[c.mapaAtual].m[f.x][f.y] = 10;
-				else if (m[c.mapaAtual].m[f.x + 1][f.y] == 0)
-					m[c.mapaAtual].m[f.x + 1][f.y] = 10;
-				else if (m[c.mapaAtual].m[f.x - 1][f.y] == 0)
-					m[c.mapaAtual].m[f.x - 1][f.y] = 10;
-				else if (m[c.mapaAtual].m[f.x][f.y + 1] == 0)
-					m[c.mapaAtual].m[f.x][f.y + 1] = 10;
-				else if (m[c.mapaAtual].m[f.x][f.y - 1] == 0)
-					m[c.mapaAtual].m[f.x][f.y - 1] = 10;
-			}
-			else 
-			{
-				if (m[c.mapaAtual].m[f.x][f.y] == 0)
-					m[c.mapaAtual].m[f.x][f.y] = 9;
-				else if (m[c.mapaAtual].m[f.x + 1][f.y] == 0)
-					m[c.mapaAtual].m[f.x + 1][f.y] = 9;
-				else if (m[c.mapaAtual].m[f.x - 1][f.y] == 0)
-					m[c.mapaAtual].m[f.x - 1][f.y] = 9;
-				else if (m[c.mapaAtual].m[f.x][f.y + 1] == 0)
-					m[c.mapaAtual].m[f.x][f.y + 1] = 9;
-				else if (m[c.mapaAtual].m[f.x][f.y - 1] == 0)
-					m[c.mapaAtual].m[f.x][f.y - 1] = 9;
-			}
+			if (f.vazio)
+				mudarPosicao(f, m, c, 9);
+			else
+				mudarPosicao(f, m, c, 10);
 		}
 	}
 }
