@@ -17,11 +17,41 @@ AUTORES: Carlos Eduardo de Borba Machado;
 //
 #define L 16
 #define C 32
-#define TEMPO_MAXIMO 45.0
+#define TEMPO_MAXIMO 4.0
 //
 
 using namespace std;
 
+/*-------------------------------- STRUCTS ------------------------------------*/
+struct Formiga
+{
+	int comidaAtual = 0;
+	bool vazio = true;
+};
+
+typedef struct Mapa
+{
+	int m[L][C];
+};
+
+struct Controle
+{
+	bool menu  = true,
+		 facil = true,
+		 fim   = false,
+		 sair  = false;
+
+	clock_t tempoInicial = 0,
+			tempoFinal   = 0;
+
+	double tempoTotal    = TEMPO_MAXIMO,
+		   tempoExecucao = 0;
+
+	int mapaAtual = 0;
+};
+/*-----------------------------------------------------------------------------*/
+
+// Oculta o cursor do console
 void esconderCursor(void)
 {
 	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -31,6 +61,7 @@ void esconderCursor(void)
 	SetConsoleCursorInfo(consoleHandle, &info);
 }
 
+// Muda a posição do cursor do console (no caso desse jogo ele coloca na posição inicial para que o mapa possa ser atualizado a cada "frame" se é que da para chamar assim kk)
 void setarCursor(int x, int y)
 {
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), COORD{ static_cast<short>(x), static_cast<short>(y) });
@@ -46,7 +77,7 @@ void setarCursor(int x, int y)
 // PARTE DO CÓDIGO ESCRITA POR CAIO
 //
 // Responsável por preencher as matrizes
-void preencherMapas(int m1[L][C], int m2[L][C], int m3[L][C])
+void preencherMapas(Mapa m[])
 {
 	int mapa1[L][C] =
 	{
@@ -89,20 +120,20 @@ void preencherMapas(int m1[L][C], int m2[L][C], int m3[L][C])
 	int mapa3[L][C] =
 	{
 		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
-		{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,8,1 },
-		{ 1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,5,1 },
-		{ 1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,0,1 },
-		{ 1,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1 },
-		{ 1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,7,1,0,1,1,1,1,1,1,1,1,1,0,1 },
-		{ 1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,0,0,5,1,0,0,0,0,0,0,0,0,0,0,0,1 },
-		{ 1,0,1,0,0,0,0,0,0,1,0,1,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1 },
-		{ 1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,0,0,0,0,1,0,0,0,0,0,0,1 },
-		{ 1,0,1,0,1,0,0,0,0,0,0,1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,0,1 },
-		{ 1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,1,0,0,0,0,0,1,0,1,0,1,1,0,1 },
-		{ 1,0,1,0,1,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,1,0,1,0,1,0,1,0,0,0,0,1 },
-		{ 1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,1,0,0,0,1,0,0,0,1,0,1,1,1,1 },
-		{ 1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,1,1,1 },
-		{ 1,6,5,0,1,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,1 },
+		{ 1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,8,1 },
+		{ 1,0,1,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,5,1 },
+		{ 1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,1,0,1 },
+		{ 1,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,1,0,1 },
+		{ 1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,7,1,0,1,1,1,1,1,1,1,1,1,0,1 },
+		{ 1,0,1,0,1,1,1,1,0,1,0,1,1,1,0,1,0,0,5,1,0,1,1,1,0,0,0,0,0,0,0,1 },
+		{ 1,0,1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,1,0,1,1,1,0,1,1,1,1,1,0,1 },
+		{ 1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1 },
+		{ 1,0,1,0,1,0,0,0,0,0,0,1,0,1,0,1,0,1,1,1,1,0,1,0,1,0,1,1,1,1,0,1 },
+		{ 1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,0,0,0,1,1,1,0,1,0,1,0,1,1,1,1,0,1 },
+		{ 1,0,1,0,1,0,1,1,1,1,1,0,0,1,0,1,1,0,1,1,1,0,1,0,1,0,1,0,0,0,0,1 },
+		{ 1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,1,1,0,1,0,0,0,1,0,0,0,1,0,1,1,0,1 },
+		{ 1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,1,0,1 },
+		{ 1,6,5,0,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1 },
 		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }
 	};
 
@@ -110,9 +141,9 @@ void preencherMapas(int m1[L][C], int m2[L][C], int m3[L][C])
 	{
 		for (int j = 0; j < C; j++)
 		{
-			m1[i][j] = mapa1[i][j];
-			m2[i][j] = mapa2[i][j];
-			m3[i][j] = mapa3[i][j];
+			m[0].m[i][j] = mapa1[i][j];
+			m[1].m[i][j] = mapa2[i][j];
+			m[2].m[i][j] = mapa3[i][j];
 		}
 
 	}
@@ -132,15 +163,11 @@ void menu(bool &facil, bool &sair, bool &menu)
 		{
 		case 'w': //cima
 			if (opcao)
-			{
 				opcao = false;
-			}
 			break;
 		case 's': //baixo
 			if (!opcao)
-			{
 				opcao = true;
-			}
 			break;
 		case 27: // sair
 			sair = true;
@@ -181,6 +208,7 @@ void menu(bool &facil, bool &sair, bool &menu)
 	cout << "*  Movimentacao - Teclas WASD  *" << endl;
 	cout << "*     Pegar comida - Barra     *" << endl;
 	cout << "*    Pressione ESC para sair   *" << endl;
+	cout << "*     Desligue o Caps Lock     *" << endl;
 	cout << "*                              *" << endl;
 	cout << "********************************";
 	//-------------------------------------------- //
@@ -316,9 +344,8 @@ void verificarArmazem(int &comida, int local[3][4], int a, int m[L][C], int x, i
 }
 
 // Nessa função são executados os comandos do jogo
-void lerComandos(int m[L][C], bool &sair, int local[3][4], bool &vazio, int &comidaAtualFormiga, bool &fim)
+void lerComandos(int m[L][C], bool &sair, int local[3][4], bool &vazio, int &comidaAtualFormiga, bool &fim, int &x, int &y)
 {
-	static int x = 1, y = 1;
 	char tecla;
 
 	if (_kbhit())
@@ -367,21 +394,15 @@ void lerComandos(int m[L][C], bool &sair, int local[3][4], bool &vazio, int &com
 			if (m[x + 1][y] == 5 || m[x - 1][y] == 5 || m[x][y + 1] == 5 || m[x][y - 1] == 5)
 			{
 				if (x > 10 && y < 5) // armazem 1 (inicial baixo)
-				{
 					verificarArmazem(comidaAtualFormiga, local, 0, m, x, y, vazio, fim);
-				}
 				if (x > 5 && x < 10 && y > 14 && y < 20) // armazem 2 (meio)
-				{
 					verificarArmazem(comidaAtualFormiga, local, 1, m, x, y, vazio, fim);
-				}
 				if (x < 5 && y > 25) // armazem 3 (cima final)
-				{
 					verificarArmazem(comidaAtualFormiga, local, 2, m, x, y, vazio, fim);
-				}
 			}
 			break;
 		}
-		//Sleep(50);
+		Sleep(50);
 	}
 }
 
@@ -434,8 +455,10 @@ bool venceuJogo(bool tempo)
 // PARTE DO CÓDIGO ESCRITA POR MATEUS
 //
 // função para medir tempo e sortear novo mapa 
-void medirTempo(bool inicio, int &mapa, clock_t &tempoInicial, clock_t &tempoFinal, double &tempoTotal, double &tempoExecucao)
+void medirTempo(bool inicio, int &mapa, clock_t &tempoInicial, clock_t &tempoFinal, double &tempoTotal, double &tempoExecucao, Mapa m[], int &x, int &y)
 {
+	int aux = mapa;
+	bool carregando = false;
 	if (inicio)
 	{
 		tempoInicial = clock();
@@ -447,9 +470,58 @@ void medirTempo(bool inicio, int &mapa, clock_t &tempoInicial, clock_t &tempoFin
 		tempoExecucao -= (tempoFinal - tempoInicial) / (double)CLOCKS_PER_SEC;
 		if (tempoTotal < 0)
 		{
+			for (int i = 0; i < L; i++) 
+			{
+				for (int j = 0; j < C; j++) 
+				{
+					if (m[mapa].m[i][j] == 9) 
+					{
+						x = i;
+						y = j;
+						m[mapa].m[i][j] = 0;
+						carregando = false;
+					}
+					if (m[mapa].m[i][j] == 10) 
+					{
+						x = i;
+						y = j;
+						m[mapa].m[i][j] = 0;
+						carregando = true;
+					}
+				}
+			}
 			srand(time(NULL));
-			mapa = rand() % 2;
+
+			mapa = rand() % 3;
+
 			tempoTotal = TEMPO_MAXIMO;
+
+			if (carregando) 
+			{
+				if (m[mapa].m[x][y] == 0)
+					m[mapa].m[x][y] = 10;
+				else if (m[mapa].m[x + 1][y] == 0)
+					m[mapa].m[x + 1][y] = 10;
+				else if (m[mapa].m[x - 1][y] == 0)
+					m[mapa].m[x - 1][y] = 10;
+				else if (m[mapa].m[x][y + 1] == 0)
+					m[mapa].m[x][y + 1] = 10;
+				else if (m[mapa].m[x][y - 1] == 0)
+					m[mapa].m[x][y - 1] = 10;
+			}
+			else 
+			{
+				if (m[mapa].m[x][y] == 0)
+					m[mapa].m[x][y] = 9;
+				else if (m[mapa].m[x + 1][y] == 0)
+					m[mapa].m[x + 1][y] = 9;
+				else if (m[mapa].m[x - 1][y] == 0)
+					m[mapa].m[x - 1][y] = 9;
+				else if (m[mapa].m[x][y + 1] == 0)
+					m[mapa].m[x][y + 1] = 9;
+				else if (m[mapa].m[x][y - 1] == 0)
+					m[mapa].m[x][y - 1] = 9;
+			}
 		}
 	}
 }
@@ -464,32 +536,6 @@ void medirTempo(bool inicio, int &mapa, clock_t &tempoInicial, clock_t &tempoFin
 
 // TANTO A FUNÇÃO MAIN COMO SUAS VARIÁVEIS FORAM MANIPULADAS POR TODO O GRUPO
 //
-/*-------------------------------- STRUCTS ------------------------------------*/
-struct Formiga
-{
-	int comidaAtual = 0;
-	bool vazio = true;
-};
-
-struct Mapa
-{
-	int m[L][C];
-};
-
-struct Controle
-{
-	bool menu  = true,
-		 sair  = false,
-		 fim   = false,
-		 facil = true;
-	clock_t tempoInicial = 0,
-			tempoFinal   = 0;
-	double tempoTotal    = TEMPO_MAXIMO,
-		   tempoExecucao = 0;
-	int mapaAtual = 0;
-};
-/*-----------------------------------------------------------------------------*/
-
 int main(void)
 {
 	/*-------------------------------- VARIÁVEIS ------------------------------*/
@@ -497,11 +543,12 @@ int main(void)
 	Formiga formiga;
 	Controle controle;
 	int armazem[3][4];
+	int x = 1, y = 1;
 	/*-------------------------------------------------------------------------*/
 
 	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
 	esconderCursor();
-	preencherMapas(mapa[0].m, mapa[1].m, mapa[2].m);
+	preencherMapas(mapa);
 	iniciarArmazem(armazem);
 	//setlocale(LC_ALL, "Portuguese");
 	//AO TENTAR USAR O SETLOCALE BUGOU TODOS OS CARACTERES DO MAPA
@@ -519,10 +566,10 @@ int main(void)
 		}
 		else
 		{
-			medirTempo(true, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal, controle.tempoExecucao);
+			medirTempo(true, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal, controle.tempoExecucao, mapa, x, y);
 			imprimir(mapa[controle.mapaAtual].m, formiga.comidaAtual, armazem, controle.tempoTotal);
-			lerComandos(mapa[controle.mapaAtual].m, controle.sair, armazem, formiga.vazio, formiga.comidaAtual, controle.fim);
-			medirTempo(false, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal, controle.tempoExecucao);
+			lerComandos(mapa[controle.mapaAtual].m, controle.sair, armazem, formiga.vazio, formiga.comidaAtual, controle.fim, x, y);
+			medirTempo(false, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal, controle.tempoExecucao, mapa, x, y);
 		}
 		setarCursor(0, 0);
 		if (controle.fim)
