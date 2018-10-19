@@ -22,6 +22,33 @@ AUTORES: Carlos Eduardo de Borba Machado;
 
 using namespace std;
 
+/*-------------------------------- STRUCTS ------------------------------------*/
+struct Formiga
+{
+	int comidaAtual = 0;
+	bool vazio = true;
+};
+
+typedef struct Mapa
+{
+	int m[L][C];
+};
+
+struct Controle
+{
+	bool menu = true,
+		sair = false,
+		fim = false,
+		facil = true;
+	clock_t tempoInicial = 0,
+		tempoFinal = 0;
+	double tempoTotal = TEMPO_MAXIMO,
+		tempoExecucao = 0;
+	int mapaAtual = 0;
+};
+/*-----------------------------------------------------------------------------*/
+
+// Oculta o cursor do console
 void esconderCursor(void)
 {
 	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -31,6 +58,7 @@ void esconderCursor(void)
 	SetConsoleCursorInfo(consoleHandle, &info);
 }
 
+// Muda a posição do cursor do console (no caso desse jogo ele coloca na posição inicial para que o mapa possa ser atualizado a cada "frame" se é que da para chamar assim kk)
 void setarCursor(int x, int y)
 {
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), COORD{ static_cast<short>(x), static_cast<short>(y) });
@@ -132,15 +160,11 @@ void menu(bool &facil, bool &sair, bool &menu)
 		{
 		case 'w': //cima
 			if (opcao)
-			{
 				opcao = false;
-			}
 			break;
 		case 's': //baixo
 			if (!opcao)
-			{
 				opcao = true;
-			}
 			break;
 		case 27: // sair
 			sair = true;
@@ -160,14 +184,14 @@ void menu(bool &facil, bool &sair, bool &menu)
 	cout << "*                              *" << endl;
 	cout << "*                              *" << endl;
 	if (!opcao)
-	cout << "*           * Facil *          *" << endl;
+		cout << "*           * Facil *          *" << endl;
 	else
-	cout << "*             Facil            *" << endl;
+		cout << "*             Facil            *" << endl;
 	cout << "*                              *" << endl;
 	if (opcao)
-	cout << "*          * Dificil *         *" << endl;
+		cout << "*          * Dificil *         *" << endl;
 	else
-	cout << "*            Dificil           *" << endl;
+		cout << "*            Dificil           *" << endl;
 	cout << "*                              *" << endl;
 	cout << "*                              *" << endl;
 	cout << "*          Instrucoes:         *" << endl;
@@ -316,9 +340,8 @@ void verificarArmazem(int &comida, int local[3][4], int a, int m[L][C], int x, i
 }
 
 // Nessa função são executados os comandos do jogo
-void lerComandos(int m[L][C], bool &sair, int local[3][4], bool &vazio, int &comidaAtualFormiga, bool &fim)
+void lerComandos(int m[L][C], bool &sair, int local[3][4], bool &vazio, int &comidaAtualFormiga, bool &fim, int &x, int &y)
 {
-	static int x = 1, y = 1;
 	char tecla;
 
 	if (_kbhit())
@@ -381,7 +404,7 @@ void lerComandos(int m[L][C], bool &sair, int local[3][4], bool &vazio, int &com
 			}
 			break;
 		}
-		//Sleep(50);
+		Sleep(50);
 	}
 }
 
@@ -434,9 +457,9 @@ bool venceuJogo(bool tempo)
 // PARTE DO CÓDIGO ESCRITA POR MATEUS
 //
 // função para medir tempo e sortear novo mapa 
-void medirTempo(bool inicio, int &mapa, clock_t &tempoInicial, clock_t &tempoFinal, double &tempoTotal, double &tempoExecucao, int m[L][C])
+void medirTempo(bool inicio, int &mapa, clock_t &tempoInicial, clock_t &tempoFinal, double &tempoTotal, double &tempoExecucao, Mapa m[], int &x, int &y)
 {
-	int x=0, y=0, aux=mapa;
+	int aux = mapa;
 	bool carregando = false;
 	if (inicio)
 	{
@@ -449,59 +472,58 @@ void medirTempo(bool inicio, int &mapa, clock_t &tempoInicial, clock_t &tempoFin
 		tempoExecucao -= (tempoFinal - tempoInicial) / (double)CLOCKS_PER_SEC;
 		if (tempoTotal < 0)
 		{
-			for (int i = 0; i < L; i++) {
-				for (int j = 0; j < C; j++) {
-					if (m[i][j] == 9) {
+			for (int i = 0; i < L; i++) 
+			{
+				for (int j = 0; j < C; j++) 
+				{
+					if (m[mapa].m[i][j] == 9) 
+					{
 						x = i;
 						y = j;
-						m[i][j] = 0;
+						m[mapa].m[i][j] = 0;
 						carregando = false;
 					}
-					if (m[i][j] == 10) {
+					if (m[mapa].m[i][j] == 10) 
+					{
 						x = i;
 						y = j;
-						m[i][j] = 0;
+						m[mapa].m[i][j] = 0;
 						carregando = true;
 					}
 				}
 			}
 			srand(time(NULL));
-			
-				mapa = rand() % 3;
-			
+
+			mapa = rand() % 3;
+
 			tempoTotal = TEMPO_MAXIMO;
 
-			if (m[x][y] == 1 && carregando == false) {
-				if (m[x + 1][y] == 0 ) {
-					m[x + 1][y] == 9;
-				}
-				else if (m[x - 1][y] == 0) {
-					m[x - 1][y] == 9;
-				}
-				else if (m[x][y+1] == 0) {
-					m[x][y + 1] == 9;
-				}
-				else if (m[x][y-1] == 0) {
-					m[x][y - 1] == 9;
-				}
+			if (carregando) 
+			{
+				if (m[mapa].m[x][y] == 0)
+					m[mapa].m[x][y] = 10;
+				else if (m[mapa].m[x + 1][y] == 0)
+					m[mapa].m[x + 1][y] = 10;
+				else if (m[mapa].m[x - 1][y] == 0)
+					m[mapa].m[x - 1][y] = 10;
+				else if (m[mapa].m[x][y + 1] == 0)
+					m[mapa].m[x][y + 1] = 10;
+				else if (m[mapa].m[x][y - 1] == 0)
+					m[mapa].m[x][y - 1] = 10;
 			}
-
-			if (m[x][y] == 1 && carregando == false) {
-				if (m[x + 1][y] == 0) {
-					m[x + 1][y] == 10;
-				}
-				else if (m[x - 1][y] == 0) {
-					m[x - 1][y] == 10;
-				}
-				else if (m[x][y + 1] == 0) {
-					m[x][y + 1] == 10;
-				}
-				else if (m[x][y - 1] == 0) {
-					m[x][y - 1] == 10;
-				}
+			else 
+			{
+				if (m[mapa].m[x][y] == 0)
+					m[mapa].m[x][y] = 9;
+				else if (m[mapa].m[x + 1][y] == 0)
+					m[mapa].m[x + 1][y] = 9;
+				else if (m[mapa].m[x - 1][y] == 0)
+					m[mapa].m[x - 1][y] = 9;
+				else if (m[mapa].m[x][y + 1] == 0)
+					m[mapa].m[x][y + 1] = 9;
+				else if (m[mapa].m[x][y - 1] == 0)
+					m[mapa].m[x][y - 1] = 9;
 			}
-			tempoTotal = TEMPO_MAXIMO;
-
 		}
 	}
 }
@@ -516,32 +538,6 @@ void medirTempo(bool inicio, int &mapa, clock_t &tempoInicial, clock_t &tempoFin
 
 // TANTO A FUNÇÃO MAIN COMO SUAS VARIÁVEIS FORAM MANIPULADAS POR TODO O GRUPO
 //
-/*-------------------------------- STRUCTS ------------------------------------*/
-struct Formiga
-{
-	int comidaAtual = 0;
-	bool vazio = true;
-};
-
-struct Mapa
-{
-	int m[L][C];
-};
-
-struct Controle
-{
-	bool menu  = true,
-		 sair  = false,
-		 fim   = false,
-		 facil = true;
-	clock_t tempoInicial = 0,
-			tempoFinal   = 0;
-	double tempoTotal    = TEMPO_MAXIMO,
-		   tempoExecucao = 0;
-	int mapaAtual = 0;
-};
-/*-----------------------------------------------------------------------------*/
-
 int main(void)
 {
 	/*-------------------------------- VARIÁVEIS ------------------------------*/
@@ -549,6 +545,7 @@ int main(void)
 	Formiga formiga;
 	Controle controle;
 	int armazem[3][4];
+	int x = 1, y = 1;
 	/*-------------------------------------------------------------------------*/
 
 	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
@@ -571,10 +568,10 @@ int main(void)
 		}
 		else
 		{
-			medirTempo(true, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal, controle.tempoExecucao, mapa[controle.mapaAtual].m);
+			medirTempo(true, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal, controle.tempoExecucao, mapa, x, y);
 			imprimir(mapa[controle.mapaAtual].m, formiga.comidaAtual, armazem, controle.tempoTotal);
-			lerComandos(mapa[controle.mapaAtual].m, controle.sair, armazem, formiga.vazio, formiga.comidaAtual, controle.fim);
-			medirTempo(false, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal, controle.tempoExecucao, mapa[controle.mapaAtual].m);
+			lerComandos(mapa[controle.mapaAtual].m, controle.sair, armazem, formiga.vazio, formiga.comidaAtual, controle.fim, x, y);
+			medirTempo(false, controle.mapaAtual, controle.tempoInicial, controle.tempoFinal, controle.tempoTotal, controle.tempoExecucao, mapa, x, y);
 		}
 		setarCursor(0, 0);
 		if (controle.fim)
