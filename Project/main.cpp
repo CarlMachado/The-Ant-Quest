@@ -126,31 +126,28 @@ void menu(Controle &c)
 	static bool opcao = false;
 	char tecla;
 
-	if (_kbhit())
-	{
-		tecla = _getch();
+	tecla = getch();
 
-		switch (tecla)
-		{
-		case 'w': //cima
-			if (opcao)
-				opcao = false;
-			break;
-		case 's': //baixo
-			if (!opcao)
-				opcao = true;
-			break;
-		case 27: // sair
-			c.sair = true;
-			break;
-		case 32: // seleciona
-			if (opcao)
-				c.facil = false;
-			else
-				c.facil = true;
-			c.menu = false;
-			break;
-		}
+	switch (tecla)
+	{
+	case 'w': //cima
+		if (opcao)
+			opcao = false;
+		break;
+	case 's': //baixo
+		if (!opcao)
+			opcao = true;
+		break;
+	case 27: // sair
+		c.sair = true;
+		break;
+	case 32: // seleciona
+		if (opcao)
+			c.facil = false;
+		else
+			c.facil = true;
+		c.menu = false;
+		break;
 	}
 	//----------------- MENU --------------------- //
 
@@ -305,7 +302,7 @@ void lerComandos(int m[L][C], int armazem[3][4], Controle &c, Formiga &f) {
 void imprimir(int m[L][C], int a[3][4], Controle c, Formiga f)
 {
 	int l = 0, t = 25;
-	int x = 0, y = 0;
+	int x = 0, y = 100;
 	for (int i = 0; i < L; i++)
 	{
 		for (int j = 0; j < C; j++)
@@ -483,44 +480,44 @@ void medirTempo(bool inicio, Controle &c, Mapa m[], Formiga &f)
 int main(void)
 {
 	/*-------------------------------- VARIÁVEIS ------------------------------*/
-	Mapa mapa[3];
-	Formiga formiga;
-	Controle controle;
+	Mapa m[3];
+	Formiga f;
+	Controle c;
 	int armazem[3][4];
 	/*-------------------------------------------------------------------------*/
 
 	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
-	initwindow(805, 405, "The Ant Quest");
-	preencherMapas(mapa);
+	initwindow(805, 505, "The Ant Quest");
+	preencherMapas(m);
 	iniciarArmazem(armazem);
 	/*-------------------------------------------------------------------------*/
 
 	/*------------------------------ LOOP PRINCIPAL ---------------------------*/
-	while (!controle.sair)
+	while (!c.sair)
 	{
-		if (controle.menu)
+		if (c.menu)
 		{
-			menu(controle);
+			menu(c);
 		}
-		else if (controle.jogar)
+		else if (c.jogar)
 		{
-			medirTempo(true, controle, mapa, formiga);
-			imprimir(mapa[controle.mapaAtual].m, armazem, controle, formiga);
-			lerComandos(mapa[controle.mapaAtual].m, armazem, controle, formiga);
-			medirTempo(false, controle, mapa, formiga);
+			medirTempo(true, c, m, f);
+			imprimir(m[c.mapaAtual].m, armazem, c, f);
+			lerComandos(m[c.mapaAtual].m, armazem, c, f);
+			medirTempo(false, c, m, f);
 		}
-		else if (controle.pausa)
+		else if (c.pausa)
 		{
 			
 		}
 		
-		if (controle.facil && venceuFacil(armazem))
+		if (c.facil && venceuFacil(armazem))
 		{
-			controle.sair = venceuJogo(controle.tempoExecucao);
+			c.sair = venceuJogo(c.tempoExecucao);
 		}
-		else if (!controle.facil && venceuDificil(armazem))
+		else if (!c.facil && venceuDificil(armazem))
 		{
-			controle.sair = venceuJogo(controle.tempoExecucao);
+			c.sair = venceuJogo(c.tempoExecucao);
 		}
 	}
 	/*-------------------------------------------------------------------------*/
