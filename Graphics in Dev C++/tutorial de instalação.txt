@@ -1,0 +1,33 @@
+1. Baixar a ultima versão do Dev C++
+
+https://sourceforge.net/projects/orwelldevcpp/
+
+
+2. Ir na pasta 
+	
+C:\Program Files (x86)\Dev-Cpp\MinGW64\include\
+
+e colar os arquivos 
+			
+graphics.h e wimbgim.h
+
+
+3. Ir na pasta 
+
+C:\Program Files (x86)\Dev-Cpp\MinGW64\lib\
+
+e colar o arquivo 
+
+libbgi.a
+
+
+4. Com o Dev C++ aberto, ir em Projeto > Opções do Projeto > Parâmetro > Linker e colar exatamente:
+
+-lbgi
+-lgdi32
+-lcomdlg32
+-luuid
+-loleaut32
+-lole32
+
+e clicar em OK
