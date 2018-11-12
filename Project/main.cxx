@@ -314,6 +314,8 @@ void lerComandos(Mapa &m, Controle &c, Formiga &f) {
 void imprimir(Mapa m, Controle c, Formiga f){
 	int l = 0, t = 20;
 	int x = 0, y = 100;
+	/*---------------------------- HUD -------------------------------*/
+	//cout << "Tempo ate o terremoto: " << (int)c.tempoTotal << "   " << endl;
 	setfillstyle(SOLID_FILL, RED);
 	bar(10, 10, 990, 90);
 	
@@ -346,21 +348,6 @@ void imprimir(Mapa m, Controle c, Formiga f){
 		y += t;
 		x = l;
 	}
-
-	/*---------------------------- HUD -------------------------------*/
-	//PROVAVELMENTE SERÁ RETIRADO
-	/*
-	cout << endl;
-	cout << "Tempo ate o terremoto: " << (int)c.tempoTotal << "   " << endl;
-	if (f.comidaAtual == 0)
-	cout << "Comida atual da formiga: nenhuma \n\n";
-	else
-	cout << "Comida atual da formiga: " << f.comidaAtual << "         " << endl << endl;
-	cout << "Armazem 1 (BAIXO):\nP1: " << a[0][0] << " | P2: " << a[0][1] << " | P3: " << a[0][2] << " | P4: " << a[0][3] << endl << endl;
-	cout << "Armazem 2  (MEIO):\nP1: " << a[1][0] << " | P2: " << a[1][1] << " | P3: " << a[1][2] << " | P4: " << a[1][3] << endl << endl;
-	cout << "Armazem 3  (CIMA):\nP1: " << a[2][0] << " | P2: " << a[2][1] << " | P3: " << a[2][2] << " | P4: " << a[2][3] << endl << endl;
-	*/
-	/*----------------------------------------------------------------*/
 }
 
 // Verificam se o jogador venceu
