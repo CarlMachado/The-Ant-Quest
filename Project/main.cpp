@@ -331,7 +331,7 @@ void lerComandos(Mapa &m, Controle &c, Formiga &f) {
 			break;
 		}
 	}
-	//Sleep(f.velocidade);
+	al_rest(f.velocidade);
 }
 
 // Nessa função a matriz é percorrida e os números são substituidos
@@ -344,6 +344,7 @@ void imprimir(Mapa m, Controle c, Formiga f, Textura t) {
 	for(int i = 0; i < m.y; i++) {
 		for(int j = 0; j < m.x; j++) {
 			if(m.mapa[i][j] == PAREDE) {
+				al_draw_bitmap(t.caminho, x, y, 0);
 				al_draw_bitmap(t.parede, x, y, 0);
 			} else if (m.mapa[i][j] == CAMINHO) {
 				al_draw_bitmap(t.caminho, x, y, 0);
@@ -480,24 +481,18 @@ int main(void) {
 	/*-------------------------------------------------------------------------*/
 
 	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
+	// Inicializando gráficos
 	al_init();
 	al_set_new_display_flags(ALLEGRO_OPENGL);
 	display = al_create_display(LARGURA, ALTURA);
 	al_set_window_title(display, "The Ant Quest");
 	al_init_image_addon();
+	al_install_keyboard();
 
 	// Carregando imagens
 	t.parede = al_load_bitmap("PAREDE.png");
 	t.caminho = al_load_bitmap("CAMINHO.png");
-	if (!t.parede) {
-		system("pause");
-		return -1;
-	}
-	if (!t.caminho) {
-		system("pause");
-		return -1;
-	}
-
+	t.fomiga = al_load_bitmap("FORMIGA.png");
 
 	// Inicialização dos conteúdos
 	novoMapa(m);
