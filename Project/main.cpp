@@ -24,6 +24,9 @@
 
 // CONSTANTES
 //
+#define LARGURA 800
+#define ALTURA 600
+
 #define TEMPO_MAXIMO 45.0
 
 #define TECLA_ACIMA 119
@@ -76,7 +79,9 @@ typedef struct Mapa {
 };
 
 typedef struct Textura {
-	ALLEGRO_BITMAP *terreno[2];
+	ALLEGRO_BITMAP *parede;
+	ALLEGRO_BITMAP *caminho;
+	ALLEGRO_BITMAP *fomiga;
 };
 
 /*-----------------------------------------------------------------------------*/
@@ -331,17 +336,17 @@ void lerComandos(Mapa &m, Controle &c, Formiga &f) {
 
 // Nessa função a matriz é percorrida e os números são substituidos
 void imprimir(Mapa m, Controle c, Formiga f, Textura t) {
-	int x = 0, y = 100;
-	int TILE = 20;
+	int x = 0, y = 0;
+	int TILE = 50;
 	/*---------------------------- HUD -------------------------------*/
 	//cout << "Tempo ate o terremoto: " << (int)c.tempoTotal << "   " << endl;
 
 	for(int i = 0; i < m.y; i++) {
 		for(int j = 0; j < m.x; j++) {
 			if(m.mapa[i][j] == PAREDE) {
-				al_draw_bitmap(t.terreno[0], x, y, 0);
+				al_draw_bitmap(t.parede, x, y, 0);
 			} else if (m.mapa[i][j] == CAMINHO) {
-				al_draw_bitmap(t.terreno[1], x, y, 0);
+				al_draw_bitmap(t.caminho, x, y, 0);
 			} else if (m.mapa[i][j] == PERSONAGEM_VAZIO) {
 
 			} else if (m.mapa[i][j] == PERSONAGEM_CHEIO) {
@@ -418,6 +423,7 @@ void mudarPosicao(Formiga &f, Mapa &m, Controle c, int PESONAGEM) {
 		}
 	}
 }
+//
 // função para medir tempo e sortear novo mapa
 void medirTempo(bool inicio, Mapa &m, Controle &c, Formiga &f) {
 	if (inicio) {
@@ -470,23 +476,37 @@ int main(void) {
 	Formiga f;
 	Controle c;
 	Textura t;
-	ALLEGRO_DISPLAY *display;
+	ALLEGRO_DISPLAY *display = NULL;
 	/*-------------------------------------------------------------------------*/
 
 	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
-	if (!al_init()) {
+	al_init();
+	al_set_new_display_flags(ALLEGRO_OPENGL);
+	display = al_create_display(LARGURA, ALTURA);
+	al_set_window_title(display, "The Ant Quest");
+	al_init_image_addon();
+
+	// Carregando imagens
+	t.parede = al_load_bitmap("PAREDE.png");
+	t.caminho = al_load_bitmap("CAMINHO.png");
+	if (!t.parede) {
+		system("pause");
 		return -1;
 	}
-	display = al_create_display(1000, 640);
-	if (!display) {
+	if (!t.caminho) {
+		system("pause");
 		return -1;
 	}
+
+
+	// Inicialização dos conteúdos
 	novoMapa(m);
 	iniciarArmazem(m.armazem);
-	t.terreno[0] = al_load_bitmap("terra.bmp");
-	t.terreno[1] = al_load_bitmap("parede.bmp");
+
 	/*------------------------------ LOOP PRINCIPAL ---------------------------*/
 	while(!c.sair) {
+		al_clear_to_color(al_map_rgb(0, 0, 0));
+
 		if(c.menu) {
 			menu(c);
 		} else if (c.jogar) {
@@ -503,6 +523,8 @@ int main(void) {
 		} else if(!c.facil && venceuDificil(m.armazem)) {
 			c.sair = venceuJogo(c.tempoExecucao);
 		}
+
+		al_flip_display();
 	}
 	/*-------------------------------------------------------------------------*/
 	al_destroy_display(display);
