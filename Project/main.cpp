@@ -24,17 +24,10 @@
 
 // CONSTANTES
 //
-#define LARGURA 800
-#define ALTURA 600
+#define LARGURA 1000
+#define ALTURA 640
 
 #define TEMPO_MAXIMO 45.0
-
-#define TECLA_ACIMA 119
-#define TECLA_ABAIXO 115
-#define TECLA_DIREITA 97
-#define TECLA_ESQUERDA 100
-#define TECLA_ESC 27
-#define	TECLA_BARRA 32
 
 #define PAREDE 0
 #define CAMINHO 1
@@ -53,6 +46,7 @@
 
 enum armazens { ARMAZEM_1, ARMAZEM_2, ARMAZEM_3 };
 enum locais {POSICAO_1, POSICAO_2, POSICAO_3, POSICAO_4};
+enum movimentos {SUBIR, DESCER, ESQUERDA, DIREITA, PEGAR, SAIR, NADA};
 
 using namespace std;
 
@@ -63,6 +57,7 @@ typedef struct Controle {
 	clock_t tempoInicial = 0, tempoFinal = 0;
 	double tempoTotal = TEMPO_MAXIMO, tempoExecucao = 0;
 	int mapaAtual = 0;
+	ALLEGRO_EVENT_QUEUE *fila_eventos = NULL;
 };
 
 typedef struct Formiga {
@@ -70,18 +65,15 @@ typedef struct Formiga {
 	bool vazio = true;
 	int velocidade = 0;
 	int x = 1, y = 1;
+	ALLEGRO_BITMAP *fomiga;
 };
 
 typedef struct Mapa {
 	int armazem[3][4];
 	int **mapa;
 	int x, y;
-};
-
-typedef struct Textura {
 	ALLEGRO_BITMAP *parede;
 	ALLEGRO_BITMAP *caminho;
-	ALLEGRO_BITMAP *fomiga;
 };
 
 /*-----------------------------------------------------------------------------*/
@@ -94,31 +86,6 @@ typedef struct Textura {
 // Apresenta a tela de menu ao jogador
 void menu(Controle &c) {
 	static bool opcao = false;
-	char tecla;
-
-	if(_kbhit())
-	{
-		tecla = _getch();
-		switch (tecla)
-		{
-		case TECLA_ACIMA:
-			if (opcao)
-				opcao = false;
-			break;
-		case TECLA_ABAIXO:
-			if (!opcao)
-				opcao = true;
-			break;
-		case TECLA_BARRA:
-			if (opcao)
-				c.facil = false;
-			else
-				c.facil = true;
-			c.menu = false;
-			opcao = NULL;
-			break;
-		}
-	}
 	
 	//----------------- MENU --------------------- //
 
@@ -272,82 +239,110 @@ void verificarArmazem(Formiga &f, Mapa &m, int ARMAZEM) {
 
 // Nessa função são executados os comandos do jogo
 void lerComandos(Mapa &m, Controle &c, Formiga &f) {
-	char tecla;
+	 ALLEGRO_EVENT evento;
+	 int tecla = NADA;
 
-	if(_kbhit())
-	{
-		tecla = _getch();
-		switch(tecla)
+    al_wait_for_event(c.fila_eventos, &evento);
+ 
+    if (evento.type == ALLEGRO_EVENT_KEY_DOWN){
+        switch(evento.keyboard.keycode)
 		{
-		case TECLA_ACIMA:
-			if(m.mapa[f.x - 1][f.y] == CAMINHO) {
-				m.mapa[f.x][f.y] = CAMINHO;
-				f.x--;
-				formigaAtual(m, f);
-			}
+        case ALLEGRO_KEY_UP:
+            tecla = SUBIR;
+            break;
+        case ALLEGRO_KEY_DOWN:
+            tecla = DESCER;
+            break;
+        case ALLEGRO_KEY_LEFT:
+            tecla = ESQUERDA;
+            break;
+        case ALLEGRO_KEY_RIGHT:
+            tecla = DIREITA;
+            break;
+        case ALLEGRO_KEY_ESCAPE:
+            tecla = SAIR;
 			break;
-		case TECLA_ABAIXO:
-			if(m.mapa[f.x + 1][f.y] == CAMINHO) {
-				m.mapa[f.x][f.y] = CAMINHO;
-				f.x++;
-				formigaAtual(m, f);
-			}
-			break;
-		case TECLA_ESQUERDA:
-			if(m.mapa[f.x][f.y - 1] == CAMINHO) {
-				m.mapa[f.x][f.y] = CAMINHO;
-				f.y--;
-				formigaAtual(m, f);
-			}
-			break;
-		case TECLA_DIREITA:
-			if(m.mapa[f.x][f.y + 1] == CAMINHO) {
-				m.mapa[f.x][f.y] = CAMINHO;
-				f.y++;
-				formigaAtual(m, f);
-			}
-			break;
-		case TECLA_ESC:
-			c.pausa = true;
-			c.jogar = false;
-			break;
-		case TECLA_BARRA:  // pega ou deposita comida
-		// se alguma posição ao redor da formiga for comida ela pega
-			if (m.mapa[f.x + 1][f.y] == ARMAZEM_MAPA_1 ||
-				m.mapa[f.x - 1][f.y] == ARMAZEM_MAPA_1 ||
-				m.mapa[f.x][f.y + 1] == ARMAZEM_MAPA_1 ||
-				m.mapa[f.x][f.y - 1] == ARMAZEM_MAPA_1) // armazem 1
-				verificarArmazem(f, m, ARMAZEM_1);
-			if (m.mapa[f.x + 1][f.y] == ARMAZEM_MAPA_2 ||
-				m.mapa[f.x - 1][f.y] == ARMAZEM_MAPA_2 ||
-				m.mapa[f.x][f.y + 1] == ARMAZEM_MAPA_2 ||
-				m.mapa[f.x][f.y - 1] == ARMAZEM_MAPA_2) // armazem 2 (meio)
-				verificarArmazem(f, m, ARMAZEM_2);
-			if (m.mapa[f.x + 1][f.y] == ARMAZEM_MAPA_3 ||
-				m.mapa[f.x - 1][f.y] == ARMAZEM_MAPA_3 ||
-				m.mapa[f.x][f.y + 1] == ARMAZEM_MAPA_3 ||
-				m.mapa[f.x][f.y - 1] == ARMAZEM_MAPA_3) // armazem 3 (cima final)
-				verificarArmazem(f, m, ARMAZEM_3);
-			break;
+		case ALLEGRO_KEY_SPACE:
+			tecla = PEGAR;
+        }
+    }
+    else if (evento.type == ALLEGRO_EVENT_KEY_UP){
+        tecla = NADA;
+    }
+    else if (evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
+        c.sair = true;
+    }
+
+	switch(tecla)
+	{
+	case SUBIR:
+		if(m.mapa[f.x - 1][f.y] == CAMINHO) {
+			m.mapa[f.x][f.y] = CAMINHO;
+			f.x--;
+			formigaAtual(m, f);
 		}
+		break;
+	case DESCER:
+		if(m.mapa[f.x + 1][f.y] == CAMINHO) {
+			m.mapa[f.x][f.y] = CAMINHO;
+			f.x++;
+			formigaAtual(m, f);
+		}
+		break;
+	case ESQUERDA:
+		if(m.mapa[f.x][f.y - 1] == CAMINHO) {
+			m.mapa[f.x][f.y] = CAMINHO;
+			f.y--;
+			formigaAtual(m, f);
+		}
+		break;
+	case DIREITA:
+		if(m.mapa[f.x][f.y + 1] == CAMINHO) {
+			m.mapa[f.x][f.y] = CAMINHO;
+			f.y++;
+			formigaAtual(m, f);
+		}
+		break;
+	case SAIR:
+		c.pausa = true;
+		c.jogar = false;
+		break;
+	case PEGAR:  // pega ou deposita comida
+	// se alguma posição ao redor da formiga for comida ela pega
+		if (m.mapa[f.x + 1][f.y] == ARMAZEM_MAPA_1 ||
+			m.mapa[f.x - 1][f.y] == ARMAZEM_MAPA_1 ||
+			m.mapa[f.x][f.y + 1] == ARMAZEM_MAPA_1 ||
+			m.mapa[f.x][f.y - 1] == ARMAZEM_MAPA_1) // armazem 1
+			verificarArmazem(f, m, ARMAZEM_1);
+		if (m.mapa[f.x + 1][f.y] == ARMAZEM_MAPA_2 ||
+			m.mapa[f.x - 1][f.y] == ARMAZEM_MAPA_2 ||
+			m.mapa[f.x][f.y + 1] == ARMAZEM_MAPA_2 ||
+			m.mapa[f.x][f.y - 1] == ARMAZEM_MAPA_2) // armazem 2 (meio)
+			verificarArmazem(f, m, ARMAZEM_2);
+		if (m.mapa[f.x + 1][f.y] == ARMAZEM_MAPA_3 ||
+			m.mapa[f.x - 1][f.y] == ARMAZEM_MAPA_3 ||
+			m.mapa[f.x][f.y + 1] == ARMAZEM_MAPA_3 ||
+			m.mapa[f.x][f.y - 1] == ARMAZEM_MAPA_3) // armazem 3 (cima final)
+			verificarArmazem(f, m, ARMAZEM_3);
+		break;
 	}
 	al_rest(f.velocidade);
 }
 
 // Nessa função a matriz é percorrida e os números são substituidos
-void imprimir(Mapa m, Controle c, Formiga f, Textura t) {
+void imprimir(Mapa m, Controle c, Formiga f) {
 	int x = 0, y = 0;
-	int TILE = 50;
+	int TILE = 20;
 	/*---------------------------- HUD -------------------------------*/
 	//cout << "Tempo ate o terremoto: " << (int)c.tempoTotal << "   " << endl;
 
 	for(int i = 0; i < m.y; i++) {
 		for(int j = 0; j < m.x; j++) {
 			if(m.mapa[i][j] == PAREDE) {
-				al_draw_bitmap(t.caminho, x, y, 0);
-				al_draw_bitmap(t.parede, x, y, 0);
+				al_draw_bitmap(m.caminho, x, y, 0);
+				al_draw_bitmap(m.parede, x, y, 0);
 			} else if (m.mapa[i][j] == CAMINHO) {
-				al_draw_bitmap(t.caminho, x, y, 0);
+				al_draw_bitmap(m.caminho, x, y, 0);
 			} else if (m.mapa[i][j] == PERSONAGEM_VAZIO) {
 
 			} else if (m.mapa[i][j] == PERSONAGEM_CHEIO) {
@@ -476,7 +471,6 @@ int main(void) {
 	Mapa m;
 	Formiga f;
 	Controle c;
-	Textura t;
 	ALLEGRO_DISPLAY *display = NULL;
 	/*-------------------------------------------------------------------------*/
 
@@ -488,11 +482,14 @@ int main(void) {
 	al_set_window_title(display, "The Ant Quest");
 	al_init_image_addon();
 	al_install_keyboard();
+	c.fila_eventos = al_create_event_queue();
+	al_register_event_source(c.fila_eventos, al_get_keyboard_event_source());
+	al_register_event_source(c.fila_eventos, al_get_display_event_source(display));
 
 	// Carregando imagens
-	t.parede = al_load_bitmap("PAREDE.png");
-	t.caminho = al_load_bitmap("CAMINHO.png");
-	t.fomiga = al_load_bitmap("FORMIGA.png");
+	m.parede = al_load_bitmap("PAREDE.png");
+	m.caminho = al_load_bitmap("CAMINHO.png");
+	f.fomiga = al_load_bitmap("FORMIGA.png");
 
 	// Inicialização dos conteúdos
 	novoMapa(m);
@@ -506,7 +503,7 @@ int main(void) {
 			menu(c);
 		} else if (c.jogar) {
 			//medirTempo(true, m, c, f);
-			imprimir(m, c, f, t);
+			imprimir(m, c, f);
 			//lerComandos(m, c, f);
 			//medirTempo(false, m, c, f);
 		} else if(c.pausa) {
@@ -523,6 +520,7 @@ int main(void) {
 	}
 	/*-------------------------------------------------------------------------*/
 	al_destroy_display(display);
+	al_destroy_event_queue(c.fila_eventos);
 	return 0;
 }
 //
