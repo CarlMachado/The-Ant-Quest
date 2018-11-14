@@ -35,9 +35,9 @@
 
 #define PAREDE 0
 #define CAMINHO 1
-#define ARMAZEM_1 6
-#define ARMAZEM_2 7
-#define ARMAZEM_3 8
+#define ARMAZEM_MAPA_1 6
+#define ARMAZEM_MAPA_2 7
+#define ARMAZEM_MAPA_3 8
 #define PERSONAGEM_VAZIO 9
 #define PERSONAGEM_CHEIO 10
 
@@ -48,7 +48,7 @@
 #define COMIDA_4 4
 //
 
-enum armazens { ARMAZEM_LOCAL_1, ARMAZEM_LOCAL_2, ARMAZEM_LOCAL_3 };
+enum armazens { ARMAZEM_1, ARMAZEM_2, ARMAZEM_3 };
 enum locais {POSICAO_1, POSICAO_2, POSICAO_3, POSICAO_4};
 
 using namespace std;
@@ -146,10 +146,10 @@ void iniciarArmazem(int a[3][4]) {
 		for(int j = 0; j < 4; j++) {
 			if(i == 0) {
 				if (j == 0) {
-					a[ARMAZEM_LOCAL_1][POSICAO_1] = COMIDA_4;
-					a[ARMAZEM_LOCAL_1][POSICAO_2] = COMIDA_3;
-					a[ARMAZEM_LOCAL_1][POSICAO_3] = COMIDA_2;
-					a[ARMAZEM_LOCAL_1][POSICAO_3] = COMIDA_1;
+					a[ARMAZEM_1][POSICAO_1] = COMIDA_4;
+					a[ARMAZEM_1][POSICAO_2] = COMIDA_3;
+					a[ARMAZEM_1][POSICAO_3] = COMIDA_2;
+					a[ARMAZEM_1][POSICAO_3] = COMIDA_1;
 				}
 			} else {
 				a[i][j] = SEM_COMIDA;
@@ -308,21 +308,21 @@ void lerComandos(Mapa &m, Controle &c, Formiga &f) {
 			break;
 		case TECLA_BARRA:  // pega ou deposita comida
 		// se alguma posição ao redor da formiga for comida ela pega
-			if (m.mapa[f.x + 1][f.y] == ARMAZEM_1 ||
-				m.mapa[f.x - 1][f.y] == ARMAZEM_1 ||
-				m.mapa[f.x][f.y + 1] == ARMAZEM_1 ||
-				m.mapa[f.x][f.y - 1] == ARMAZEM_1) // armazem 1
-				verificarArmazem(f, m, ARMAZEM_LOCAL_1);
-			if (m.mapa[f.x + 1][f.y] == ARMAZEM_2 ||
-				m.mapa[f.x - 1][f.y] == ARMAZEM_2 ||
-				m.mapa[f.x][f.y + 1] == ARMAZEM_2 ||
-				m.mapa[f.x][f.y - 1] == ARMAZEM_2) // armazem 2 (meio)
-				verificarArmazem(f, m, ARMAZEM_LOCAL_2);
-			if (m.mapa[f.x + 1][f.y] == ARMAZEM_3 ||
-				m.mapa[f.x - 1][f.y] == ARMAZEM_3 ||
-				m.mapa[f.x][f.y + 1] == ARMAZEM_3 ||
-				m.mapa[f.x][f.y - 1] == ARMAZEM_3) // armazem 3 (cima final)
-				verificarArmazem(f, m, ARMAZEM_LOCAL_3);
+			if (m.mapa[f.x + 1][f.y] == ARMAZEM_MAPA_1 ||
+				m.mapa[f.x - 1][f.y] == ARMAZEM_MAPA_1 ||
+				m.mapa[f.x][f.y + 1] == ARMAZEM_MAPA_1 ||
+				m.mapa[f.x][f.y - 1] == ARMAZEM_MAPA_1) // armazem 1
+				verificarArmazem(f, m, ARMAZEM_1);
+			if (m.mapa[f.x + 1][f.y] == ARMAZEM_MAPA_2 ||
+				m.mapa[f.x - 1][f.y] == ARMAZEM_MAPA_2 ||
+				m.mapa[f.x][f.y + 1] == ARMAZEM_MAPA_2 ||
+				m.mapa[f.x][f.y - 1] == ARMAZEM_MAPA_2) // armazem 2 (meio)
+				verificarArmazem(f, m, ARMAZEM_2);
+			if (m.mapa[f.x + 1][f.y] == ARMAZEM_MAPA_3 ||
+				m.mapa[f.x - 1][f.y] == ARMAZEM_MAPA_3 ||
+				m.mapa[f.x][f.y + 1] == ARMAZEM_MAPA_3 ||
+				m.mapa[f.x][f.y - 1] == ARMAZEM_MAPA_3) // armazem 3 (cima final)
+				verificarArmazem(f, m, ARMAZEM_3);
 			break;
 		}
 	}
@@ -346,11 +346,11 @@ void imprimir(Mapa m, Controle c, Formiga f, Textura t) {
 
 			} else if (m.mapa[i][j] == PERSONAGEM_CHEIO) {
 
-			} else if (m.mapa[i][j] == ARMAZEM_1) {
+			} else if (m.mapa[i][j] == ARMAZEM_MAPA_1) {
 
-			} else if (m.mapa[i][j] == ARMAZEM_2) {
+			} else if (m.mapa[i][j] == ARMAZEM_MAPA_2) {
 
-			} else if (m.mapa[i][j] == ARMAZEM_3) {
+			} else if (m.mapa[i][j] == ARMAZEM_MAPA_3) {
 
 			}
 			x += TILE;
@@ -363,13 +363,13 @@ void imprimir(Mapa m, Controle c, Formiga f, Textura t) {
 // Verificam se o jogador venceu
 bool venceuDificil(int a[3][4]) {
 	for(int i = 0; i < 4; i++)
-		if(a[ARMAZEM_LOCAL_3][i] == SEM_COMIDA)
+		if(a[ARMAZEM_3][i] == SEM_COMIDA)
 			return false;
 	return true;
 }
 
 bool venceuFacil(int a[3][4]) {
-	if(a[ARMAZEM_LOCAL_3][POSICAO_1] == COMIDA_4)
+	if(a[ARMAZEM_3][POSICAO_1] == COMIDA_4)
 		return true;
 	return false;
 }
