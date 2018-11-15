@@ -117,9 +117,9 @@ typedef struct Mapa {
 
 typedef struct Item {
 	int quantidadePa = 0;
-	int quantidadeBota = 0;
-	int quantidadeTocha = 0;
-	int quantidadeKit = 0;
+	bool tocha = false;
+	bool kitReparos = false;
+	bool bota = false;
 
 	ALLEGRO_BITMAP *imgPa;
 	ALLEGRO_BITMAP *imgBota;
@@ -547,10 +547,14 @@ void carregarImagens(Mapa &m, Formiga &f, Item &i) {
 	f.imgFormiga[DESCER] = al_load_bitmap("FORMIGA_BAIXO.png");
 	f.imgFormiga[ESQUERDA] = al_load_bitmap("FORMIGA_ESQUERDA.png");
 	f.imgFormiga[DIREITA] = al_load_bitmap("FORMIGA_DIREITA.png");
+	i.imgBota = al_load_bitmap("ITEM_BOTA.png");
+	i.imgKit = al_load_bitmap("ITEM_KIT.png");
+	i.imgPa = al_load_bitmap("ITEM_PA.png");
+	i.imgTocha = al_load_bitmap("ITEM_TOCHA.png");
 }
 
 // Verifica se o jogador venceu
-bool venceu(int a[3][4]) {
+bool venceu(int a[QUANTIDADE_ARMAZENS][QUANTIDADE_LOCAIS]) {
 	for(size_t LOCAL = 0; LOCAL < 4; LOCAL++)
 		if(a[ARMAZEM_1][LOCAL] == SEM_COMIDA)
 			return true;
