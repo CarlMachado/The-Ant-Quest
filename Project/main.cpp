@@ -481,7 +481,7 @@ void desenharFrame(Mapa m, Controle c, Formiga f, Item it) {
 	int x = (LARGURA / 2) - ((m.x * TILE) / 2), y = (PLACAR / 2) + (ALTURA / 2) - ((m.y * TILE) / 2);
 	/*---------------------------- HUD -------------------------------*/
 	al_draw_bitmap(c.imgPlaca, 0, 0, NULL);
-	al_draw_text(c.fonte10, al_map_rgb(102, 51, 0), 550, 50, NULL, "  tempo ate o terremoto: ";
+	al_draw_text(c.fonte10, al_map_rgb(102, 51, 0), 550, 50, NULL, "  tempo ate o terremoto: ");
 	//al_draw_text(c.fonte10, al_map_rgb(102, 51, 0), 550, 50, NULL, tempo);
 	//cout << "Tempo ate o terremoto: " << (int)c.tempoTotal << "   " << endl;
 	/*----------------------------------------------------------------*/
