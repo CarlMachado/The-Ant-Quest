@@ -202,15 +202,12 @@ void formigaAtual(Mapa &m, Formiga f) {
 
 // Inicializa os armazens
 void iniciarArmazem(int armazem[QUANTIDADE_ARMAZENS][QUANTIDADE_LOCAIS]) {
-	for(size_t ARMAZEM = 0; ARMAZEM < QUANTIDADE_ARMAZENS; ARMAZEM++) {
-		for(size_t LOCAL = 0; LOCAL < QUANTIDADE_LOCAIS; LOCAL++) {
-			if(ARMAZEM == 0) {
-				if (LOCAL == 0) {
-					armazem[ARMAZEM_1][POSICAO_1] = COMIDA_4;
-					armazem[ARMAZEM_1][POSICAO_2] = COMIDA_3;
-					armazem[ARMAZEM_1][POSICAO_3] = COMIDA_2;
-					armazem[ARMAZEM_1][POSICAO_3] = COMIDA_1;
-				}
+	int COMIDA = 4;
+	for (size_t ARMAZEM = 0; ARMAZEM < QUANTIDADE_ARMAZENS; ARMAZEM++) {
+		for (size_t LOCAL = 0; LOCAL < QUANTIDADE_LOCAIS; LOCAL++) {
+			if (ARMAZEM == ARMAZEM_1) {
+				armazem[ARMAZEM_1][LOCAL] = COMIDA;
+				COMIDA--;
 			} else {
 				armazem[ARMAZEM][LOCAL] = SEM_COMIDA;
 			}
@@ -227,7 +224,7 @@ void novoMapa(Mapa &m) {
 
 	srand(time(NULL));
 
-	m.x = 30 + (rand() % 16);
+	m.x = 15 + (rand() % 8);
 	if(m.x % 2 != 0)
 		m.x++;
 	m.y = (m.x / 3) * 2;
@@ -304,7 +301,7 @@ void novoMapa(Mapa &m) {
 			for(size_t y = 0; y < m.y; y++)
 				if(map[y][x] == CAMINHO)
 					cont++;
-		if(cont > 200)
+		if(cont > 79)
 			novoMapa = false;
 
 	}
@@ -475,17 +472,17 @@ void lerComandos(Mapa &m, Controle &c, Formiga &f) {
 
 // Nessa função a matriz é percorrida e os números são substituidos
 void desenharFrame(Mapa m, Controle c, Formiga f, Item it) {
-	const int TILE = 20;
+	const int TILE = 40;
 	const int PLACAR = 100;
-	//const char *tempo = (char)c.tempoTotal;
+	const char tempo[5] = { (int)c.tempoTotal };
 	int x = (LARGURA / 2) - ((m.x * TILE) / 2), y = (PLACAR / 2) + (ALTURA / 2) - ((m.y * TILE) / 2);
 	/*---------------------------- HUD -------------------------------*/
 	al_draw_bitmap(c.imgPlaca, 0, 0, NULL);
 	al_draw_text(c.fonte10, al_map_rgb(102, 51, 0), 550, 50, NULL, "  tempo ate o terremoto: ");
-	//al_draw_text(c.fonte10, al_map_rgb(102, 51, 0), 550, 50, NULL, tempo);
+	al_draw_text(c.fonte10, al_map_rgb(102, 51, 0), 650, 50, NULL, tempo);
 	//cout << "Tempo ate o terremoto: " << (int)c.tempoTotal << "   " << endl;
 	/*----------------------------------------------------------------*/
-	al_draw_bitmap(m.imgBackground, 0, PLACAR, NULL);
+	//al_draw_bitmap(m.imgBackground, 0, PLACAR, NULL);
 	for(size_t i = 0; i < m.y; i++) {
 		for(size_t j = 0; j < m.x; j++) {
 			if(m.mapa[i][j] == PAREDE) {
@@ -675,18 +672,18 @@ int main(void) {
 		if(c.menu) {
 			menu(c);
 		} else if (c.jogar) {
-			//medirTempo(true, m, c, f);
+			medirTempo(true, m, c, f);
 			desenharFrame(m, c, f, i);
 			lerComandos(m, c, f);
-			//medirTempo(false, m, c, f);
+			medirTempo(false, m, c, f);
 		} else if(c.pausa) {
 
 		}
 
-		if(venceu(m.armazem)) {
+		/*if(venceu(m.armazem)) {
 			fimJogo(c);
 			reiniciar(m, c, f, i);
-		}
+		}*/
 
 		al_flip_display();
 	}
