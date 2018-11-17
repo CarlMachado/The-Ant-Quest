@@ -30,7 +30,7 @@ using namespace std;
 #define LARGURA 960
 #define ALTURA 740
 
-#define TEMPO_MAXIMO 2.0
+#define TEMPO_MAXIMO 45.0
 
 #define QUANTIDADE_ARMAZENS 3
 #define QUANTIDADE_LOCAIS 4
@@ -102,8 +102,8 @@ typedef struct Controle {
 typedef struct Formiga {
 	int comidaAtual = SEM_COMIDA;
 	int x, y, DIRECAO = SUBIR;
-	float velocidade = 5.0;
-	bool vazio = true;
+	float velocidade = 0.2;
+	bool vazio = false;
 	ALLEGRO_BITMAP *imgFormiga[4];
 };
 
@@ -114,7 +114,7 @@ typedef struct Mapa {
 	ALLEGRO_BITMAP *imgParede;
 	ALLEGRO_BITMAP *imgCaminho;
 	ALLEGRO_BITMAP *imgBackground;
-	ALLEGRO_BITMAP *imgComida;
+	ALLEGRO_BITMAP *imgComida[4];
 	ALLEGRO_BITMAP *imgSombra[2];
 	ALLEGRO_BITMAP *imgComidaAmazem[4];
 	ALLEGRO_BITMAP *imgArmazem[2];
@@ -123,7 +123,6 @@ typedef struct Mapa {
 typedef struct Item {
 	int quantidadePa = 0;
 	bool tocha = false;
-	bool kitReparos = false;
 	bool bota = false;
 
 	ALLEGRO_BITMAP *imgPa;
@@ -378,7 +377,6 @@ void verificarArmazem(Formiga &f, Mapa &m, int ARMAZEM) {
 
 // Nessa função são executados os comandos do jogo
 void lerComandos(Mapa &m, Controle &c, Formiga &f) {
-	int tecla = NADA;
 	if(!al_is_event_queue_empty(c.fila_eventos)) {
 		ALLEGRO_EVENT evento;
 		al_wait_for_event(c.fila_eventos, &evento);
@@ -386,87 +384,69 @@ void lerComandos(Mapa &m, Controle &c, Formiga &f) {
 			switch (evento.keyboard.keycode)
 			{
 			case ALLEGRO_KEY_UP:
-				tecla = SUBIR;
+				if (m.mapa[f.y - 1][f.x] == CAMINHO) {
+					m.mapa[f.y][f.x] = CAMINHO;
+					f.y--;
+					formigaAtual(m, f);
+					al_rest(f.velocidade);
+				}
 				f.DIRECAO = SUBIR;
 				break;
 			case ALLEGRO_KEY_DOWN:
-				tecla = DESCER;
+				if (m.mapa[f.y + 1][f.x] == CAMINHO) {
+					m.mapa[f.y][f.x] = CAMINHO;
+					f.y++;
+					formigaAtual(m, f);
+					al_rest(f.velocidade);
+				}
 				f.DIRECAO = DESCER;
 				break;
 			case ALLEGRO_KEY_LEFT:
-				tecla = ESQUERDA;
+				if (m.mapa[f.y][f.x - 1] == CAMINHO) {
+					m.mapa[f.y][f.x] = CAMINHO;
+					f.x--;
+					formigaAtual(m, f);
+					al_rest(f.velocidade);
+				}
 				f.DIRECAO = ESQUERDA;
 				break;
 			case ALLEGRO_KEY_RIGHT:
-				tecla = DIREITA;
+				if (m.mapa[f.y][f.x + 1] == CAMINHO) {
+					m.mapa[f.y][f.x] = CAMINHO;
+					f.x++;
+					formigaAtual(m, f);
+					al_rest(f.velocidade);
+				}
 				f.DIRECAO = DIREITA;
 				break;
 			case ALLEGRO_KEY_ESCAPE:
-				tecla = SAIR;
+				c.pausa = true;
+				c.jogar = false;
 				break;
 			case ALLEGRO_KEY_SPACE:
-				tecla = PEGAR;
+				// Pega ou deposita comida
+				// Se alguma posição ao redor da formiga for armazém ela chama a função verificar armazém
+				if (m.mapa[f.y + 1][f.x] == ARMAZEM_MAPA_1 ||
+					m.mapa[f.y - 1][f.x] == ARMAZEM_MAPA_1 ||
+					m.mapa[f.y][f.x + 1] == ARMAZEM_MAPA_1 ||
+					m.mapa[f.y][f.x - 1] == ARMAZEM_MAPA_1)		// O ARMAZÉM 1 É O INICIAL (DESMORONANDO)
+					verificarArmazem(f, m, ARMAZEM_1);
+				if (m.mapa[f.y + 1][f.x] == ARMAZEM_MAPA_2 ||
+					m.mapa[f.y - 1][f.x] == ARMAZEM_MAPA_2 ||
+					m.mapa[f.y][f.x + 1] == ARMAZEM_MAPA_2 ||
+					m.mapa[f.y][f.x - 1] == ARMAZEM_MAPA_2)
+					verificarArmazem(f, m, ARMAZEM_2);
+				if (m.mapa[f.y + 1][f.x] == ARMAZEM_MAPA_3 ||
+					m.mapa[f.y - 1][f.x] == ARMAZEM_MAPA_3 ||
+					m.mapa[f.y][f.x + 1] == ARMAZEM_MAPA_3 ||
+					m.mapa[f.y][f.x - 1] == ARMAZEM_MAPA_3)
+					verificarArmazem(f, m, ARMAZEM_3);
 			}
 		} else if (evento.type == ALLEGRO_EVENT_KEY_UP) {
-			tecla = NADA;
+			//tecla = NADA;
 		} else if (evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			c.sair = true;
 		}
-	}
-	
-	switch(tecla)
-	{
-	case SUBIR:
-		if(m.mapa[f.y - 1][f.x] == CAMINHO) {
-			m.mapa[f.y][f.x] = CAMINHO;
-			f.y--;
-			formigaAtual(m, f);
-		}
-		break;
-	case DESCER:
-		if(m.mapa[f.y + 1][f.x] == CAMINHO) {
-			m.mapa[f.y][f.x] = CAMINHO;
-			f.y++;
-			formigaAtual(m, f);
-		}
-		break;
-	case ESQUERDA:
-		if(m.mapa[f.y][f.x - 1] == CAMINHO) {
-			m.mapa[f.y][f.x] = CAMINHO;
-			f.x--;
-			formigaAtual(m, f);
-		}
-		break;
-	case DIREITA:
-		if(m.mapa[f.y][f.x + 1] == CAMINHO) {
-			m.mapa[f.y][f.x] = CAMINHO;
-			f.x++;
-			formigaAtual(m, f);
-		}
-		break;
-	case SAIR:
-		c.pausa = true;
-		c.jogar = false;
-		break;
-	case PEGAR:
-		// Pega ou deposita comida
-		// Se alguma posição ao redor da formiga for armazém ela chama a função verificar armazém
-		if (m.mapa[f.y + 1][f.x] == ARMAZEM_MAPA_1 ||
-			m.mapa[f.y - 1][f.x] == ARMAZEM_MAPA_1 ||
-			m.mapa[f.y][f.x + 1] == ARMAZEM_MAPA_1 ||
-			m.mapa[f.y][f.x - 1] == ARMAZEM_MAPA_1)		// O ARMAZÉM 1 É O INICIAL (DESMORONANDO)
-			verificarArmazem(f, m, ARMAZEM_1);
-		if (m.mapa[f.y + 1][f.x] == ARMAZEM_MAPA_2 ||
-			m.mapa[f.y - 1][f.x] == ARMAZEM_MAPA_2 ||
-			m.mapa[f.y][f.x + 1] == ARMAZEM_MAPA_2 ||
-			m.mapa[f.y][f.x - 1] == ARMAZEM_MAPA_2)
-			verificarArmazem(f, m, ARMAZEM_2);
-		if (m.mapa[f.y + 1][f.x] == ARMAZEM_MAPA_3 ||
-			m.mapa[f.y - 1][f.x] == ARMAZEM_MAPA_3 ||
-			m.mapa[f.y][f.x + 1] == ARMAZEM_MAPA_3 ||
-			m.mapa[f.y][f.x - 1] == ARMAZEM_MAPA_3)
-			verificarArmazem(f, m, ARMAZEM_3);
-		break;
 	}
 }
 
@@ -474,15 +454,11 @@ void lerComandos(Mapa &m, Controle &c, Formiga &f) {
 void desenharFrame(Mapa m, Controle c, Formiga f, Item it) {
 	const int TILE = 40;
 	const int PLACAR = 100;
-	const char tempo[5] = { (int)c.tempoTotal };
+	string tempoString = to_string((int)c.tempoTotal);
+	char const* tempoChar = tempoString.c_str();
 	int x = (LARGURA / 2) - ((m.x * TILE) / 2), y = (PLACAR / 2) + (ALTURA / 2) - ((m.y * TILE) / 2);
-	/*---------------------------- HUD -------------------------------*/
-	al_draw_bitmap(c.imgPlaca, 0, 0, NULL);
-	al_draw_text(c.fonte10, al_map_rgb(102, 51, 0), 550, 50, NULL, "  tempo ate o terremoto: ");
-	al_draw_text(c.fonte10, al_map_rgb(102, 51, 0), 650, 50, NULL, tempo);
-	//cout << "Tempo ate o terremoto: " << (int)c.tempoTotal << "   " << endl;
-	/*----------------------------------------------------------------*/
-	//al_draw_bitmap(m.imgBackground, 0, PLACAR, NULL);
+	int sombraX, sombraY;
+	al_draw_bitmap(m.imgBackground, 0, PLACAR, NULL);
 	for(size_t i = 0; i < m.y; i++) {
 		for(size_t j = 0; j < m.x; j++) {
 			if(m.mapa[i][j] == PAREDE) {
@@ -513,18 +489,32 @@ void desenharFrame(Mapa m, Controle c, Formiga f, Item it) {
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(m.imgArmazem[NORMAL], x, y, NULL);
 			} else if(m.mapa[i][j] == FORMIGA_VAZIO) {
+				sombraX = x + TILE / 2 - LARGURA;
+				sombraY = y + TILE / 2 + PLACAR - ALTURA;
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(f.imgFormiga[f.DIRECAO], x, y, NULL);
 			} else if(m.mapa[i][j] == FORMIGA_CHEIO) {
+				sombraX = x + TILE / 2 - LARGURA;
+				sombraY = y + TILE / 2 + PLACAR - ALTURA;
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(f.imgFormiga[f.DIRECAO], x, y, NULL);
-				al_draw_bitmap(m.imgComida, x, y, NULL);
+				al_draw_bitmap(m.imgComida[f.DIRECAO], x, y, NULL);
 			}
 			x += TILE;
 		}
 		y += TILE;
 		x = (LARGURA / 2) - ((m.x * TILE) / 2);
 	}
+	if(it.tocha)
+		al_draw_bitmap(m.imgSombra[GRANDE], sombraX, sombraY, NULL);
+	else
+		al_draw_bitmap(m.imgSombra[PEQUENA], sombraX, sombraY, NULL);
+
+	/*---------------------------- HUD -------------------------------*/
+	al_draw_bitmap(c.imgPlaca, 0, 0, NULL);
+	al_draw_text(c.fonte10, al_map_rgb(102, 51, 0), 490, 15, NULL, "tempo ate o terremoto: ");
+	al_draw_text(c.fonte10, al_map_rgb(102, 51, 0), 670, 15, NULL, tempoChar);
+	/*----------------------------------------------------------------*/
 }
 
 // Carrega o modo gráfico
@@ -547,7 +537,10 @@ void carregarRecursos(Mapa &m, Controle &c, Formiga &f, Item &i) {
 	m.imgParede = al_load_bitmap("res/PAREDE.png");
 	m.imgCaminho = al_load_bitmap("res/CAMINHO.png");
 	m.imgBackground = al_load_bitmap("res/BACKGROUND.png");
-	m.imgComida = al_load_bitmap("res/COMIDA.png");
+	m.imgComida[SUBIR] = al_load_bitmap("res/COMIDA_CIMA.png");
+	m.imgComida[DESCER] = al_load_bitmap("res/COMIDA_BAIXO.png");
+	m.imgComida[ESQUERDA] = al_load_bitmap("res/COMIDA_ESQUERDA.png");
+	m.imgComida[DIREITA] = al_load_bitmap("res/COMIDA_DIREITA.png");
 	m.imgSombra[GRANDE] = al_load_bitmap("res/SOMBRA_GRANDE.png");
 	m.imgSombra[PEQUENA] = al_load_bitmap("res/SOMBRA_PEQUENA.png");
 	m.imgArmazem[DESMORONANDO] = al_load_bitmap("res/ARMAZEM_DESMORONANDO.png");
