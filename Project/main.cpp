@@ -718,6 +718,9 @@ void medirTempo(bool inicio, Mapa &m, Controle &c, Formiga &f) {
 		}
 	}
 }
+void pausa(Controle c) {
+
+}
 //
 // FIM DA PARTE DE CÓDIGO ESCRITA POR MATEUS
 
@@ -757,7 +760,7 @@ int main(void) {
 			lerComandos(m, c, f);
 			medirTempo(false, m, c, f);
 		} else if(c.pausa) {
-
+			pausa(c);
 		}
 
 		if(venceu(m.armazem) && f.vazio) {
