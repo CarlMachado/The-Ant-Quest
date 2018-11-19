@@ -107,21 +107,21 @@ enum {
 /*-------------------------------- STRUCTS ------------------------------------*/
 
 typedef struct Controle {
-	bool menu, jogar, pausa, sair, reiniciar;
-	double tempoTotal, tempoExecucao;
-	clock_t tempoInicial, tempoFinal;
-	ALLEGRO_EVENT_QUEUE *fila_eventos;
-	ALLEGRO_DISPLAY *display;
+	bool menu = false, jogar = true, pausa = false, sair = false, reiniciar = false;
+	clock_t tempoInicial = 0, tempoFinal = 0;
+	double tempoTotal = TEMPO_MAXIMO, tempoExecucao = 0;
+	ALLEGRO_EVENT_QUEUE *fila_eventos = NULL;
+	ALLEGRO_DISPLAY *display = NULL;
 	ALLEGRO_BITMAP *imgPlaca;
 	ALLEGRO_BITMAP *imgMenu;
 	ALLEGRO_FONT *fonte[TOTAL_FONTES];
 };
 
 typedef struct Formiga {
-	int comidaAtual;
-	int x, y, DIRECAO;
-	float velocidade;
-	bool vazio;
+	int comidaAtual = SEM_COMIDA;
+	int x, y, DIRECAO = SUBIR;
+	float velocidade = 0.2;
+	bool vazio = false;
 	ALLEGRO_BITMAP *imgFormiga[4];
 };
 
@@ -139,9 +139,10 @@ typedef struct Mapa {
 };
 
 typedef struct Item {
-	int quantidadePa;
-	bool tocha;
-	bool bota;
+	int quantidadePa = 0;
+	bool tocha = false;
+	bool bota = false;
+
 	ALLEGRO_BITMAP *imgPa;
 	ALLEGRO_BITMAP *imgBota;
 	ALLEGRO_BITMAP *imgTocha;
@@ -533,7 +534,7 @@ void desenharFrame(Mapa m, Controle c, Formiga f, Item it) {
 }
 
 // Carrega o modo gráfico
-void inicializarAllegro(Controle &c) {
+void inicializar(Controle &c) {
 	al_init();
 	al_set_new_display_flags(ALLEGRO_OPENGL);
 	c.display = al_create_display(LARGURA, ALTURA);
@@ -597,10 +598,10 @@ void fimJogo(Controle c) {
 	string tempoString = to_string((int)c.tempoExecucao);
 	char const* tempoChar = tempoString.c_str();
 	al_draw_bitmap(c.imgMenu, 0, 0, NULL);
-	al_draw_text(c.fonte[T50], al_map_rgb(50, 25, 0), x + 140, y + 100, NULL, "parabens!");
+	al_draw_text(c.fonte[T50], al_map_rgb(50, 25, 0), x + 140, y + 100, NULL, "PARABENS!");
 	al_draw_text(c.fonte[T50], al_map_rgb(50, 25, 0), x + 0, y + 200, NULL, "seu tempo foi de: ");
 	al_draw_text(c.fonte[T50], al_map_rgb(50, 25, 0), x + 530, y + 200, NULL, tempoChar);
-	al_draw_text(c.fonte[T20], al_map_rgb(50, 25, 0), x + 90, y + 400, NULL, "aperte ENTER para continuar");
+	al_draw_text(c.fonte[T50], al_map_rgb(50, 25, 0), x + 0, y + 200, NULL, "seu tempo foi de: ");
 	if(!al_is_event_queue_empty(c.fila_eventos)) {
 		ALLEGRO_EVENT evento;
 		al_wait_for_event(c.fila_eventos, &evento);
@@ -614,25 +615,6 @@ void fimJogo(Controle c) {
 			c.sair = true;
 		}
 	}
-}
-
-void inicializarVariaveis(Mapa &m, Controle &c, Formiga &f, Item &i) {
-	c.menu = false;
-	c.jogar = true;
-	c.pausa = false;
-	c.sair = false;
-	c.reiniciar = false;
-	c.tempoInicial = 0;
-	c.tempoFinal = 0;
-	c.tempoTotal = TEMPO_MAXIMO;
-	c.tempoExecucao = 0;
-	f.comidaAtual = SEM_COMIDA;
-	f.DIRECAO = SUBIR;
-	f.velocidade = 0.2;
-	f.vazio = true;
-	i.quantidadePa = 0;
-	i.tocha = false;
-	i.bota = false;
 }
 
 // Finaliza o programa
@@ -670,10 +652,7 @@ void finalizar(Mapa &m, Controle &c, Formiga &f, Item &i) {
 
 // Reinicia as variáveis
 void reiniciar(Mapa &m, Controle &c, Formiga &f, Item &i) {
-	inicializarVariaveis(m, c, f, i);
-	novoMapa(m);
-	posicionarFormiga(m, f);
-	iniciarArmazem(m.armazem);
+	c.jogar = true;
 }
 //
 // FIM DA PARTE DE CÓDIGO ESCRITA POR CARLOS
@@ -728,12 +707,11 @@ int main(void) {
 
 	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
 	
-	inicializarVariaveis(m, c, f, i);
-	inicializarAllegro(c);
+	inicializar(c);
 	carregarRecursos(m, c, f, i);
 	novoMapa(m);
 	posicionarFormiga(m, f);
-	//iniciarArmazem(m.armazem);
+	iniciarArmazem(m.armazem);
 
 	/*------------------------------ LOOP PRINCIPAL ---------------------------*/
 
@@ -756,6 +734,7 @@ int main(void) {
 			if(c.reiniciar)
 				reiniciar(m, c, f, i);
 		}
+		
 		al_flip_display();
 	}
 
