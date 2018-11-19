@@ -120,7 +120,8 @@ typedef struct Controle {
 typedef struct Formiga {
 	int comidaAtual;
 	int x, y, DIRECAO;
-	float velocidade;
+	int tempoInicial, tempoDecorrido;
+	int velocidade;
 	bool vazio;
 	ALLEGRO_BITMAP *imgFormiga[4];
 };
@@ -388,6 +389,7 @@ void verificarArmazem(Formiga &f, Mapa &m, int ARMAZEM) {
 
 // Nessa função são executados os comandos do jogo
 void lerComandos(Mapa &m, Controle &c, Formiga &f) {
+	f.tempoDecorrido = clock();
 	if(!al_is_event_queue_empty(c.fila_eventos)) {
 		ALLEGRO_EVENT evento;
 		al_wait_for_event(c.fila_eventos, &evento);
@@ -396,43 +398,51 @@ void lerComandos(Mapa &m, Controle &c, Formiga &f) {
 			{
 			case ALLEGRO_KEY_W:
 			case ALLEGRO_KEY_UP:
-				if (m.mapa[f.y - 1][f.x] == CAMINHO) {
-					m.mapa[f.y][f.x] = CAMINHO;
-					f.y--;
-					formigaAtual(m, f);
-					al_rest(f.velocidade);
+				if(f.tempoDecorrido - f.tempoInicial > f.velocidade){
+					if (m.mapa[f.y - 1][f.x] == CAMINHO) {
+						m.mapa[f.y][f.x] = CAMINHO;
+						f.y--;
+						formigaAtual(m, f);
+					}
+					f.DIRECAO = SUBIR;
+					f.tempoInicial = f.tempoDecorrido;
 				}
-				f.DIRECAO = SUBIR;
 				break;
 			case ALLEGRO_KEY_S:
 			case ALLEGRO_KEY_DOWN:
-				if (m.mapa[f.y + 1][f.x] == CAMINHO) {
-					m.mapa[f.y][f.x] = CAMINHO;
-					f.y++;
-					formigaAtual(m, f);
-					al_rest(f.velocidade);
+				if(f.tempoDecorrido - f.tempoInicial > f.velocidade) {
+					if(m.mapa[f.y + 1][f.x] == CAMINHO) {
+						m.mapa[f.y][f.x] = CAMINHO;
+						f.y++;
+						formigaAtual(m, f);
+					}
+					f.DIRECAO = DESCER;
+					f.tempoInicial = f.tempoDecorrido;
 				}
-				f.DIRECAO = DESCER;
 				break;
 			case ALLEGRO_KEY_A:
 			case ALLEGRO_KEY_LEFT:
-				if (m.mapa[f.y][f.x - 1] == CAMINHO) {
-					m.mapa[f.y][f.x] = CAMINHO;
-					f.x--;
-					formigaAtual(m, f);
-					al_rest(f.velocidade);
+				if (f.tempoDecorrido - f.tempoInicial > f.velocidade) {
+					if (m.mapa[f.y][f.x - 1] == CAMINHO) {
+						m.mapa[f.y][f.x] = CAMINHO;
+						f.x--;
+						formigaAtual(m, f);
+					}
+					f.DIRECAO = ESQUERDA;
+					f.tempoInicial = f.tempoDecorrido;
 				}
-				f.DIRECAO = ESQUERDA;
 				break;
 			case ALLEGRO_KEY_D:
 			case ALLEGRO_KEY_RIGHT:
-				if (m.mapa[f.y][f.x + 1] == CAMINHO) {
-					m.mapa[f.y][f.x] = CAMINHO;
-					f.x++;
-					formigaAtual(m, f);
-					al_rest(f.velocidade);
+				if (f.tempoDecorrido - f.tempoInicial > f.velocidade) {
+					if (m.mapa[f.y][f.x + 1] == CAMINHO) {
+						m.mapa[f.y][f.x] = CAMINHO;
+						f.x++;
+						formigaAtual(m, f);
+					}
+					f.DIRECAO = DIREITA;
+					f.tempoInicial = f.tempoDecorrido;
 				}
-				f.DIRECAO = DIREITA;
 				break;
 			case ALLEGRO_KEY_ESCAPE:
 				c.pausa = true;
@@ -583,16 +593,18 @@ void carregarRecursos(Mapa &m, Controle &c, Formiga &f, Item &i) {
 
 // Verifica se o jogador venceu
 bool venceu(int a[QUANTIDADE_ARMAZENS][QUANTIDADE_LOCAIS]) {
+	int cont = 0;
 	for(size_t LOCAL = 0; LOCAL < QUANTIDADE_LOCAIS; LOCAL++)
-		if (a[ARMAZEM_1][LOCAL] == SEM_COMIDA) {
-			return true;
-		}
-	return false;
+		if(a[ARMAZEM_1][LOCAL] == SEM_COMIDA)
+			cont++;
+	if(cont == 4)
+		return true;
+	else
+		return false;
 }
 
 // Tela de fim de jogo
-void fimJogo(Controle c) {
-	c.jogar = false;
+void fimJogo(Controle &c) {
 	int x = 180, y = 260;
 	string tempoString = to_string((int)c.tempoExecucao);
 	char const* tempoChar = tempoString.c_str();
@@ -601,6 +613,7 @@ void fimJogo(Controle c) {
 	al_draw_text(c.fonte[T50], al_map_rgb(50, 25, 0), x + 0, y + 200, NULL, "seu tempo foi de: ");
 	al_draw_text(c.fonte[T50], al_map_rgb(50, 25, 0), x + 530, y + 200, NULL, tempoChar);
 	al_draw_text(c.fonte[T20], al_map_rgb(50, 25, 0), x + 90, y + 400, NULL, "aperte ENTER para continuar");
+	c.jogar = false;
 	if(!al_is_event_queue_empty(c.fila_eventos)) {
 		ALLEGRO_EVENT evento;
 		al_wait_for_event(c.fila_eventos, &evento);
@@ -610,7 +623,7 @@ void fimJogo(Controle c) {
 			case ALLEGRO_KEY_ENTER:
 				c.reiniciar = true;
 			}
-		} else if (evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+		} else if(evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			c.sair = true;
 		}
 	}
@@ -628,7 +641,7 @@ void inicializarVariaveis(Mapa &m, Controle &c, Formiga &f, Item &i) {
 	c.tempoExecucao = 0;
 	f.comidaAtual = SEM_COMIDA;
 	f.DIRECAO = SUBIR;
-	f.velocidade = 0.2;
+	f.velocidade = 200;
 	f.vazio = true;
 	i.quantidadePa = 0;
 	i.tocha = false;
@@ -669,7 +682,7 @@ void finalizar(Mapa &m, Controle &c, Formiga &f, Item &i) {
 }
 
 // Reinicia as variáveis
-void reiniciar(Mapa &m, Controle &c, Formiga &f, Item &i) {
+void inicializarJogo(Mapa &m, Controle &c, Formiga &f, Item &i) {
 	inicializarVariaveis(m, c, f, i);
 	novoMapa(m);
 	posicionarFormiga(m, f);
@@ -728,18 +741,14 @@ int main(void) {
 
 	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
 	
-	inicializarVariaveis(m, c, f, i);
 	inicializarAllegro(c);
 	carregarRecursos(m, c, f, i);
-	novoMapa(m);
-	posicionarFormiga(m, f);
-	//iniciarArmazem(m.armazem);
+	inicializarJogo(m, c, f, i);
 
 	/*------------------------------ LOOP PRINCIPAL ---------------------------*/
 
 	while(!c.sair) {
 		al_clear_to_color(al_map_rgb(0, 0, 0));
-		
 		if(c.menu) {
 			menu(c);
 		} else if (c.jogar) {
@@ -754,7 +763,7 @@ int main(void) {
 		if(venceu(m.armazem) && f.vazio) {
 			fimJogo(c);
 			if(c.reiniciar)
-				reiniciar(m, c, f, i);
+				inicializarJogo(m, c, f, i);
 		}
 		al_flip_display();
 	}
