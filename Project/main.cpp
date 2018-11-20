@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <allegro5/allegro.h>
+#include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
@@ -242,6 +243,7 @@ void novoMapa(Mapa &m) {
 	if(m.y % 2 != 0)
 		m.y++;
 
+	// loop para criar o mapa, onde ele fica recriando até que saia um mapa com uma quantidade desejável de corredores
 	while (novoMapa) {
 		cont = 0;
 		map = new int *[m.y];
