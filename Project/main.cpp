@@ -1,13 +1,13 @@
 /*
- * DESCRIÇÃO: Jogo criado para a disciplina de Algoritmos e Programação.
- * AUTORES:
- * Carlos Eduardo de Borba Machado
- * Caio Gonzaga Bernils
- * Mateus Luis Ropke Lauer
- */
+* DESCRIÃ‡ÃƒO: Jogo criado para a disciplina de Algoritmos e ProgramaÃ§Ã£o.
+* AUTORES:
+* Carlos Eduardo de Borba Machado
+* Caio Gonzaga Bernils
+* Mateus Luis Ropke Lauer
+*/
 
- // BIBLIOTECAS
- //
+// BIBLIOTECAS
+//
 #include <stdio.h>
 #include <stdlib.h>
 #include <allegro5/allegro.h>
@@ -37,38 +37,38 @@ using namespace std;
 #define QUANTIDADE_LOCAIS 4
 //
 // ENUMS
-enum { 
-	PAREDE, 
-	CAMINHO, 
-	ITEM_PA, 
-	ITEM_BOTA, 
-	ITEM_TOCHA, 
-	ITEM_KIT, 
-	ARMAZEM_MAPA_1, 
-	ARMAZEM_MAPA_2, 
-	ARMAZEM_MAPA_3, 
-	FORMIGA_VAZIO, 
-	FORMIGA_CHEIO 
+enum {
+	PAREDE,
+	CAMINHO,
+	ITEM_PA,
+	ITEM_BOTA,
+	ITEM_TOCHA,
+	ITEM_KIT,
+	ARMAZEM_MAPA_1,
+	ARMAZEM_MAPA_2,
+	ARMAZEM_MAPA_3,
+	FORMIGA_VAZIO,
+	FORMIGA_CHEIO
 };
-enum { 
-	ARMAZEM_1, 
-	ARMAZEM_2, 
-	ARMAZEM_3 
+enum {
+	ARMAZEM_1,
+	ARMAZEM_2,
+	ARMAZEM_3
 };
-enum { 
-	DESMORONANDO, 
-	NORMAL 
+enum {
+	DESMORONANDO,
+	NORMAL
 };
-enum { 
-	PEQUENA, 
-	GRANDE 
+enum {
+	PEQUENA,
+	GRANDE
 };
-enum { 
-	COMIDA_1, 
-	COMIDA_2, 
-	COMIDA_3, 
-	COMIDA_4, 
-	SEM_COMIDA 
+enum {
+	COMIDA_1,
+	COMIDA_2,
+	COMIDA_3,
+	COMIDA_4,
+	SEM_COMIDA
 };
 enum {
 	LOCAL_1,
@@ -76,20 +76,20 @@ enum {
 	LOCAL_3,
 	LOCAL_4
 };
-enum { 
-	POSICAO_1, 
-	POSICAO_2, 
-	POSICAO_3, 
-	POSICAO_4 
+enum {
+	POSICAO_1,
+	POSICAO_2,
+	POSICAO_3,
+	POSICAO_4
 };
-enum { 
-	SUBIR, 
-	DESCER, 
-	ESQUERDA, 
-	DIREITA, 
+enum {
+	SUBIR,
+	DESCER,
+	ESQUERDA,
+	DIREITA,
 	PEGAR,
-	SAIR, 
-	NADA 
+	SAIR,
+	NADA
 };
 enum {
 	T10,
@@ -149,7 +149,13 @@ typedef struct Mapa {
 typedef struct Item {
 	int quantidadePa;
 	bool tocha;
+	double tempoTocha;
+	double tempoFinalTocha;
+	double tempoInicialTocha;
 	bool bota;
+	double tempoBota;
+	double tempoFinalBota;
+	double tempoInicialBota;
 	ALLEGRO_BITMAP *imgPa;
 	ALLEGRO_BITMAP *imgBota;
 	ALLEGRO_BITMAP *imgTocha;
@@ -161,11 +167,40 @@ typedef struct Item {
 
 
 
-// PARTE DO CÓDIGO ESCRITA POR CAIO
+// PARTE DO CÃ“DIGO ESCRITA POR CAIO
 //
+void tempoItem(bool inicio, Item &i) {
+	if (inicio) {
+		i.tempoInicialBota = clock();
+		i.tempoInicialTocha = clock();
+	}
+	else {
+		i.tempoFinalBota = clock();
+		i.tempoFinalTocha= clock();
+		i.tempoBota -= (i.tempoFinalBota - i.tempoInicialBota) / (double)CLOCKS_PER_SEC;
+		i.tempoTocha -= (i.tempoFinalTocha - i.tempoInicialTocha) / (double)CLOCKS_PER_SEC;
+	}
+}
+
+void posicionarItens(Mapa &m, Item &i) {
+	bool sortear = true;
+	int x, y;
+	srand(time(NULL));
+	for (size_t ITEM = 2; ITEM < 6; ITEM++) {
+		while (sortear) {
+			x = rand() % m.x;
+			y = rand() % m.y;
+			if (m.mapa[y][x] == CAMINHO) {
+				m.mapa[y][x] = ITEM;
+				sortear = false;
+			}
+		}
+		sortear = true;
+	}
+}
 // Apresenta a tela de menu ao jogador
 void menu(Controle &c) {
-	if(!al_is_event_queue_empty(c.fila_eventos)) {
+	if (!al_is_event_queue_empty(c.fila_eventos)) {
 		ALLEGRO_EVENT evento;
 		al_wait_for_event(c.fila_eventos, &evento);
 		if (evento.type == ALLEGRO_EVENT_KEY_DOWN) {
@@ -184,16 +219,17 @@ void menu(Controle &c) {
 
 				break;
 			}
-		} else if (evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+		}
+		else if (evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			c.sair = true;
 		}
 	}
 
-	//LÓGICA MENU
+	//LÃ“GICA MENU
 
 }
 //
-// FIM DA PARTE DE CÓDIGO ESCRITA POR CAIO
+// FIM DA PARTE DE CÃ“DIGO ESCRITA POR CAIO
 
 
 
@@ -201,11 +237,11 @@ void menu(Controle &c) {
 
 
 
-// PARTE DO CÓDIGO ESCRITA POR CARLOS
+// PARTE DO CÃ“DIGO ESCRITA POR CARLOS
 //
-// Verifica se a formiga está ou não com comida
+// Verifica se a formiga estÃ¡ ou nÃ£o com comida
 void formigaAtual(Mapa &m, Formiga f) {
-	if(f.vazio)
+	if (f.vazio)
 		m.mapa[f.y][f.x] = FORMIGA_VAZIO;
 	else
 		m.mapa[f.y][f.x] = FORMIGA_CHEIO;
@@ -219,7 +255,8 @@ void iniciarArmazem(int armazem[QUANTIDADE_ARMAZENS][QUANTIDADE_LOCAIS]) {
 			if (ARMAZEM == ARMAZEM_1) {
 				armazem[ARMAZEM_1][LOCAL] = COMIDA;
 				COMIDA--;
-			} else {
+			}
+			else {
 				armazem[ARMAZEM][LOCAL] = SEM_COMIDA;
 			}
 		}
@@ -235,15 +272,15 @@ void novoMapa(Mapa &m) {
 
 	srand(time(NULL));
 
-	// verifica se o tamanho da matriz é par para encaixar na textura na hr da impressão
+	// verifica se o tamanho da matriz Ã© par para encaixar na textura na hr da impressÃ£o
 	m.x = 15 + (rand() % 8);
-	if(m.x % 2 != 0)
+	if (m.x % 2 != 0)
 		m.x++;
 	m.y = (m.x / 3) * 2;
-	if(m.y % 2 != 0)
+	if (m.y % 2 != 0)
 		m.y++;
 
-	// loop para criar o mapa, onde ele fica recriando até que saia um mapa com uma quantidade desejável de corredores
+	// loop para criar o mapa, onde ele fica recriando atÃ© que saia um mapa com uma quantidade desejÃ¡vel de corredores
 	while (novoMapa) {
 		cont = 0;
 		map = new int *[m.y];
@@ -311,12 +348,12 @@ void novoMapa(Mapa &m) {
 			}
 		}
 
-		// faz a contagem da quantidade de CAMINHOS para que não gere um mapa muito pequeno
-		for(size_t x = 0; x < m.x; x++)
-			for(size_t y = 0; y < m.y; y++)
-				if(map[y][x] == CAMINHO)
+		// faz a contagem da quantidade de CAMINHOS para que nÃ£o gere um mapa muito pequeno
+		for (size_t x = 0; x < m.x; x++)
+			for (size_t y = 0; y < m.y; y++)
+				if (map[y][x] == CAMINHO)
 					cont++;
-		if (cont > 79)
+		if (cont > 75)
 			novoMapa = false;
 		else
 			delete map;
@@ -329,28 +366,28 @@ void novoMapa(Mapa &m) {
 
 	m.mapa = new int *[m.y];
 
-	for(size_t y = 0; y < m.y; y++)
+	for (size_t y = 0; y < m.y; y++)
 		m.mapa[y] = new int[m.x];
 
-	for(size_t x = 0; x < m.x; x++)
-		for(size_t y = 0; y < m.y; y++)
+	for (size_t x = 0; x < m.x; x++)
+		for (size_t y = 0; y < m.y; y++)
 			m.mapa[y][x] = PAREDE;
 
-	for(size_t x = 1; x < m.x - 1; x++)
-		for(size_t y = 1; y < m.y - 1; y++)
+	for (size_t x = 1; x < m.x - 1; x++)
+		for (size_t y = 1; y < m.y - 1; y++)
 			m.mapa[y][x] = map[y - 1][x - 1];
 
 	delete map;
 }
 
-// Colcoa uma nova formiga no mapa
+// Coloca uma nova formiga no mapa
 void posicionarFormiga(Mapa &m, Formiga &f) {
 	bool sortear = true;
 	srand(time(NULL));
-	while(sortear) {
+	while (sortear) {
 		f.x = rand() % m.x;
 		f.y = rand() % m.y;
-		if(m.mapa[f.y][f.x] == CAMINHO) {
+		if (m.mapa[f.y][f.x] == CAMINHO) {
 			if (f.vazio)
 				m.mapa[f.y][f.x] = FORMIGA_VAZIO;
 			else
@@ -360,12 +397,12 @@ void posicionarFormiga(Mapa &m, Formiga &f) {
 	}
 }
 
-// Nessa função verifica-se se vai retirar ou colocar a comida no armazém
+// Nessa funÃ§Ã£o verifica-se se vai retirar ou colocar a comida no armazÃ©m
 void verificarArmazem(Formiga &f, Mapa &m, int ARMAZEM) {
 	int LOCAL;
 	bool retirar = false;
 
-	if(f.comidaAtual == 0) { // Se a formiga não tiver segurando comida, significa que ela vai pegar do armazém
+	if (f.comidaAtual == 0) { // Se a formiga nÃ£o tiver segurando comida, significa que ela vai pegar do armazÃ©m
 		for (LOCAL = 3; LOCAL >= 0; LOCAL--) {
 			if (m.armazem[ARMAZEM][LOCAL] != SEM_COMIDA) {
 				f.comidaAtual = m.armazem[ARMAZEM][LOCAL];
@@ -375,15 +412,16 @@ void verificarArmazem(Formiga &f, Mapa &m, int ARMAZEM) {
 				LOCAL = -1;
 			}
 		}
-	} else { // Se já tiver, ela vai colocar no armazém
-		for(LOCAL = 0; LOCAL <= 3; LOCAL++) {
-			if(m.armazem[ARMAZEM][LOCAL] == SEM_COMIDA) {
-				if(LOCAL == 0)
+	}
+	else { // Se jÃ¡ tiver, ela vai colocar no armazÃ©m
+		for (LOCAL = 0; LOCAL <= 3; LOCAL++) {
+			if (m.armazem[ARMAZEM][LOCAL] == SEM_COMIDA) {
+				if (LOCAL == 0)
 					retirar = true;
-				else if(f.comidaAtual < m.armazem[ARMAZEM][LOCAL - 1])
+				else if (f.comidaAtual < m.armazem[ARMAZEM][LOCAL - 1])
 					retirar = true;
 
-				if(retirar) {
+				if (retirar) {
 					m.armazem[ARMAZEM][LOCAL] = f.comidaAtual;
 					f.comidaAtual = SEM_COMIDA;
 					m.mapa[f.x][f.y] = FORMIGA_VAZIO;
@@ -395,62 +433,171 @@ void verificarArmazem(Formiga &f, Mapa &m, int ARMAZEM) {
 	}
 }
 
-// Nessa função são executados os comandos do jogo
-void lerComandos(Mapa &m, Controle &c, Formiga &f) {
+// Nessa funÃ§Ã£o sÃ£o executados os comandos do jogo
+void lerComandos(Mapa &m, Controle &c, Formiga &f, Item &i) {
 	f.tempoDecorrido = clock();
-	if(!al_is_event_queue_empty(c.fila_eventos)) {
+	if (!al_is_event_queue_empty(c.fila_eventos)) {
 		ALLEGRO_EVENT evento;
 		al_wait_for_event(c.fila_eventos, &evento);
-		if(evento.type == ALLEGRO_EVENT_KEY_CHAR) {
+		if (evento.type == ALLEGRO_EVENT_KEY_CHAR) {
 			switch (evento.keyboard.keycode)
 			{
 			case ALLEGRO_KEY_W:
 			case ALLEGRO_KEY_UP:
-				if(f.tempoDecorrido - f.tempoInicial > f.velocidade){
-					if (m.mapa[f.y - 1][f.x] == CAMINHO) {
+				if (f.tempoDecorrido - f.tempoInicial > f.velocidade) {
+					if (m.mapa[f.y - 1][f.x] == CAMINHO    ||
+						m.mapa[f.y - 1][f.x] == ITEM_PA    ||
+						m.mapa[f.y - 1][f.x] == ITEM_BOTA  ||
+						m.mapa[f.y - 1][f.x] == ITEM_TOCHA ||
+						m.mapa[f.y - 1][f.x] == ITEM_KIT) {
+						if (m.mapa[f.y - 1][f.x] == ITEM_PA) {
+							i.quantidadePa++;
+						}
+						if (m.mapa[f.y - 1][f.x] == ITEM_BOTA) {
+							if (i.bota){
+								i.tempoBota += 30.0;
+							} else{
+								i.bota = true;
+								i.tempoBota = 30.0;
+							}
+						}
+						if (m.mapa[f.y - 1][f.x] == ITEM_TOCHA) {
+							if (i.tocha) {
+								i.tempoTocha += 30.0;
+							}
+							else {
+								i.tocha = true;
+								i.tempoTocha = 30.0;
+							}
+						}
+						if (m.mapa[f.y - 1][f.x] == ITEM_KIT) {
+							c.tempoTotal += 30;
+						}
 						m.mapa[f.y][f.x] = CAMINHO;
 						f.y--;
 						formigaAtual(m, f);
 					}
-					f.DIRECAO = SUBIR;
 					f.tempoInicial = f.tempoDecorrido;
 				}
+				f.DIRECAO = SUBIR;
 				break;
 			case ALLEGRO_KEY_S:
 			case ALLEGRO_KEY_DOWN:
-				if(f.tempoDecorrido - f.tempoInicial > f.velocidade) {
-					if(m.mapa[f.y + 1][f.x] == CAMINHO) {
+				if (f.tempoDecorrido - f.tempoInicial > f.velocidade) {
+					if (m.mapa[f.y + 1][f.x] == CAMINHO    ||
+						m.mapa[f.y + 1][f.x] == ITEM_PA    ||
+						m.mapa[f.y + 1][f.x] == ITEM_BOTA  ||
+						m.mapa[f.y + 1][f.x] == ITEM_TOCHA ||
+						m.mapa[f.y + 1][f.x] == ITEM_KIT) {
+						if (m.mapa[f.y + 1][f.x] == ITEM_PA) {
+							i.quantidadePa++;
+						}
+						if (m.mapa[f.y + 1][f.x] == ITEM_BOTA) {
+							if (i.bota) {
+								i.tempoBota += 30.0;
+							}
+							else {
+								i.bota = true;
+								i.tempoBota = 30.0;
+							}
+						}
+						if (m.mapa[f.y + 1][f.x] == ITEM_TOCHA) {
+							if (i.tocha) {
+								i.tempoTocha += 30.0;
+							}
+							else {
+								i.tocha = true;
+								i.tempoTocha = 30.0;
+							}
+						}
+						if (m.mapa[f.y + 1][f.x] == ITEM_KIT) {
+							c.tempoTotal += 30;
+						}
 						m.mapa[f.y][f.x] = CAMINHO;
 						f.y++;
 						formigaAtual(m, f);
 					}
-					f.DIRECAO = DESCER;
 					f.tempoInicial = f.tempoDecorrido;
 				}
+				f.DIRECAO = DESCER;
 				break;
 			case ALLEGRO_KEY_A:
 			case ALLEGRO_KEY_LEFT:
 				if (f.tempoDecorrido - f.tempoInicial > f.velocidade) {
-					if (m.mapa[f.y][f.x - 1] == CAMINHO) {
+					if (m.mapa[f.y][f.x - 1] == CAMINHO    ||
+						m.mapa[f.y][f.x - 1] == ITEM_PA    ||
+						m.mapa[f.y][f.x - 1] == ITEM_BOTA  ||
+						m.mapa[f.y][f.x - 1] == ITEM_TOCHA ||
+						m.mapa[f.y][f.x - 1] == ITEM_KIT) {
+						if (m.mapa[f.y][f.x - 1] == ITEM_PA) {
+							i.quantidadePa++;
+						}
+						if (m.mapa[f.y][f.x - 1] == ITEM_BOTA) {
+							if (i.bota) {
+								i.tempoBota += 30.0;
+							}
+							else {
+								i.bota = true;
+								i.tempoBota = 30.0;
+							}
+						}
+						if (m.mapa[f.y][f.x - 1] == ITEM_TOCHA) {
+							if (i.tocha) {
+								i.tempoTocha += 30.0;
+							}
+							else {
+								i.tocha = true;
+								i.tempoTocha = 30.0;
+							}
+						}
+						if (m.mapa[f.y][f.x - 1] == ITEM_KIT) {
+							c.tempoTotal += 30;
+						}
 						m.mapa[f.y][f.x] = CAMINHO;
 						f.x--;
 						formigaAtual(m, f);
 					}
-					f.DIRECAO = ESQUERDA;
 					f.tempoInicial = f.tempoDecorrido;
 				}
+				f.DIRECAO = ESQUERDA;
 				break;
 			case ALLEGRO_KEY_D:
 			case ALLEGRO_KEY_RIGHT:
 				if (f.tempoDecorrido - f.tempoInicial > f.velocidade) {
-					if (m.mapa[f.y][f.x + 1] == CAMINHO) {
+					if (m.mapa[f.y][f.x + 1] == CAMINHO    ||
+						m.mapa[f.y][f.x + 1] == ITEM_PA    ||
+						m.mapa[f.y][f.x + 1] == ITEM_BOTA  ||
+						m.mapa[f.y][f.x + 1] == ITEM_TOCHA ||
+						m.mapa[f.y][f.x + 1] == ITEM_KIT) {
+						if (m.mapa[f.y][f.x + 1] == ITEM_PA) {
+							i.quantidadePa++;
+						}
+						if (m.mapa[f.y][f.x + 1] == ITEM_BOTA) {
+							if (i.bota) {
+								i.tempoBota += 30.0;
+							} else {
+								i.bota = true;
+								i.tempoBota = 30.0;
+							}
+						}
+						if (m.mapa[f.y][f.x + 1] == ITEM_TOCHA) {
+							if (i.tocha) {
+								i.tempoTocha += 30.0;
+							} else {
+								i.tocha = true;
+								i.tempoTocha = 30.0;
+							}
+						}
+						if (m.mapa[f.y][f.x + 1] == ITEM_KIT) {
+							c.tempoTotal += 30;
+						}
 						m.mapa[f.y][f.x] = CAMINHO;
 						f.x++;
 						formigaAtual(m, f);
 					}
-					f.DIRECAO = DIREITA;
 					f.tempoInicial = f.tempoDecorrido;
 				}
+				f.DIRECAO = DIREITA;
 				break;
 			case ALLEGRO_KEY_ESCAPE:
 				c.pausa = true;
@@ -459,11 +606,11 @@ void lerComandos(Mapa &m, Controle &c, Formiga &f) {
 			case ALLEGRO_KEY_ENTER:
 			case ALLEGRO_KEY_SPACE:
 				// Pega ou deposita comida
-				// Se alguma posição ao redor da formiga for armazém ela chama a função verificar armazém
+				// Se alguma posiÃ§Ã£o ao redor da formiga for armazÃ©m ela chama a funÃ§Ã£o verificar armazÃ©m
 				if (m.mapa[f.y + 1][f.x] == ARMAZEM_MAPA_1 ||
 					m.mapa[f.y - 1][f.x] == ARMAZEM_MAPA_1 ||
 					m.mapa[f.y][f.x + 1] == ARMAZEM_MAPA_1 ||
-					m.mapa[f.y][f.x - 1] == ARMAZEM_MAPA_1)		// O ARMAZÉM 1 É O INICIAL (DESMORONANDO)
+					m.mapa[f.y][f.x - 1] == ARMAZEM_MAPA_1)		// O ARMAZÃ‰M 1 Ã‰ O INICIAL (DESMORONANDO)
 					verificarArmazem(f, m, ARMAZEM_1);
 				if (m.mapa[f.y + 1][f.x] == ARMAZEM_MAPA_2 ||
 					m.mapa[f.y - 1][f.x] == ARMAZEM_MAPA_2 ||
@@ -476,45 +623,70 @@ void lerComandos(Mapa &m, Controle &c, Formiga &f) {
 					m.mapa[f.y][f.x - 1] == ARMAZEM_MAPA_3)
 					verificarArmazem(f, m, ARMAZEM_3);
 			}
-		} else if (evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+		}
+		else if (evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			c.sair = true;
+		}
+		if (i.bota) {
+			f.velocidade = 100;
+		}
+		else {
+			f.velocidade = 200;
+		}
+		if (i.tempoBota < 0.0) {
+			i.bota = false;
+		}
+		if (i.tempoTocha < 0.0) {
+			i.tocha = false;
 		}
 	}
 }
 
-// Nessa função a matriz é percorrida e os números são substituidos
+// Nessa funÃ§Ã£o a matriz Ã© percorrida e os nÃºmeros sÃ£o substituidos
 void desenharFrame(Mapa m, Controle c, Formiga f, Item it) {
 	const int TILE = 40;
 	const int PLACAR = 100;
 	string tempoString = to_string((int)c.tempoTotal);
 	char const* tempoChar = tempoString.c_str();
+	string tempoStringTocha = to_string((int)it.tempoTocha);
+	char const* tempoTocha = tempoStringTocha.c_str();
+	string tempoStringBota = to_string((int)it.tempoBota);
+	char const* tempoBota = tempoStringBota.c_str();
+	string paString = to_string((int)it.quantidadePa);
+	char const* qtdPa = paString.c_str();
 	int x = (LARGURA / 2) - ((m.x * TILE) / 2), y = (PLACAR / 2) + (ALTURA / 2) - ((m.y * TILE) / 2);
 	int sombraX, sombraY;
 	al_draw_bitmap(m.imgBackground, 0, PLACAR, NULL);
-	for(size_t i = 0; i < m.y; i++) {
-		for(size_t j = 0; j < m.x; j++) {
-			if(m.mapa[i][j] == PAREDE) {
+	for (size_t i = 0; i < m.y; i++) {
+		for (size_t j = 0; j < m.x; j++) {
+			if (m.mapa[i][j] == PAREDE) {
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(m.imgParede, x, y, NULL);
-			} else if(m.mapa[i][j] == CAMINHO) {
+			}
+			else if (m.mapa[i][j] == CAMINHO) {
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
-			} else if(m.mapa[i][j] == ITEM_PA) {
+			}
+			else if (m.mapa[i][j] == ITEM_PA) {
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(it.imgPa, x, y, NULL);
-			} else if(m.mapa[i][j] == ITEM_BOTA) {
+			}
+			else if (m.mapa[i][j] == ITEM_BOTA) {
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(it.imgBota, x, y, NULL);
-			} else if(m.mapa[i][j] == ITEM_TOCHA) {
+			}
+			else if (m.mapa[i][j] == ITEM_TOCHA) {
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(it.imgTocha, x, y, NULL);
-			} else if(m.mapa[i][j] == ITEM_KIT) {
+			}
+			else if (m.mapa[i][j] == ITEM_KIT) {
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(it.imgKit, x, y, NULL);
-			} else if(m.mapa[i][j] == ARMAZEM_MAPA_1) {
+			}
+			else if (m.mapa[i][j] == ARMAZEM_MAPA_1) {
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(m.imgArmazem[DESMORONANDO], x, y, NULL);
-				if(m.armazem[ARMAZEM_1][LOCAL_1])
+				if (m.armazem[ARMAZEM_1][LOCAL_1])
 					al_draw_bitmap(m.imgComidaAmazem[COMIDA_4], x, y, NULL);
 				if (m.armazem[ARMAZEM_1][LOCAL_2])
 					al_draw_bitmap(m.imgComidaAmazem[COMIDA_3], x, y, NULL);
@@ -522,7 +694,8 @@ void desenharFrame(Mapa m, Controle c, Formiga f, Item it) {
 					al_draw_bitmap(m.imgComidaAmazem[COMIDA_2], x, y, NULL);
 				if (m.armazem[ARMAZEM_1][LOCAL_4])
 					al_draw_bitmap(m.imgComidaAmazem[COMIDA_1], x, y, NULL);
-			} else if(m.mapa[i][j] == ARMAZEM_MAPA_2) {
+			}
+			else if (m.mapa[i][j] == ARMAZEM_MAPA_2) {
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(m.imgArmazem[NORMAL], x, y, NULL);
 				if (m.armazem[ARMAZEM_2][LOCAL_1])
@@ -533,7 +706,8 @@ void desenharFrame(Mapa m, Controle c, Formiga f, Item it) {
 					al_draw_bitmap(m.imgComidaAmazem[COMIDA_2], x, y, NULL);
 				if (m.armazem[ARMAZEM_2][LOCAL_4])
 					al_draw_bitmap(m.imgComidaAmazem[COMIDA_1], x, y, NULL);
-			} else if (m.mapa[i][j] == ARMAZEM_MAPA_3) {
+			}
+			else if (m.mapa[i][j] == ARMAZEM_MAPA_3) {
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(m.imgArmazem[NORMAL], x, y, NULL);
 				if (m.armazem[ARMAZEM_3][LOCAL_1])
@@ -544,12 +718,14 @@ void desenharFrame(Mapa m, Controle c, Formiga f, Item it) {
 					al_draw_bitmap(m.imgComidaAmazem[COMIDA_2], x, y, NULL);
 				if (m.armazem[ARMAZEM_3][LOCAL_4])
 					al_draw_bitmap(m.imgComidaAmazem[COMIDA_1], x, y, NULL);
-			} else if(m.mapa[i][j] == FORMIGA_VAZIO) {
+			}
+			else if (m.mapa[i][j] == FORMIGA_VAZIO) {
 				sombraX = x + TILE / 2 - LARGURA;
 				sombraY = y + TILE / 2 + PLACAR - ALTURA;
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(f.imgFormiga[f.DIRECAO], x, y, NULL);
-			} else if(m.mapa[i][j] == FORMIGA_CHEIO) {
+			}
+			else if (m.mapa[i][j] == FORMIGA_CHEIO) {
 				sombraX = x + TILE / 2 - LARGURA;
 				sombraY = y + TILE / 2 + PLACAR - ALTURA;
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
@@ -561,20 +737,24 @@ void desenharFrame(Mapa m, Controle c, Formiga f, Item it) {
 		y += TILE;
 		x = (LARGURA / 2) - ((m.x * TILE) / 2);
 	}
-	/*
 	if(it.tocha)
 		al_draw_bitmap(m.imgSombra[GRANDE], sombraX, sombraY, NULL);
 	else
 		al_draw_bitmap(m.imgSombra[PEQUENA], sombraX, sombraY, NULL);
-	*/
 	/*---------------------------- HUD -------------------------------*/
 	al_draw_bitmap(c.imgPlaca, 0, 0, NULL);
 	al_draw_text(c.fonte[T10], al_map_rgb(102, 51, 0), 490, 15, NULL, "tempo ate o terremoto: ");
 	al_draw_text(c.fonte[T10], al_map_rgb(102, 51, 0), 670, 15, NULL, tempoChar);
+	al_draw_text(c.fonte[T10], al_map_rgb(102, 51, 0), 490, 30, NULL, "bota: ");
+	al_draw_text(c.fonte[T10], al_map_rgb(102, 51, 0), 670, 30, NULL, tempoBota);
+	al_draw_text(c.fonte[T10], al_map_rgb(102, 51, 0), 490, 45, NULL, "tocha: ");
+	al_draw_text(c.fonte[T10], al_map_rgb(102, 51, 0), 670, 45, NULL, tempoTocha);
+	al_draw_text(c.fonte[T10], al_map_rgb(102, 51, 0), 490, 45, NULL, "pa: ");
+	al_draw_text(c.fonte[T10], al_map_rgb(102, 51, 0), 670, 45, NULL, qtdPa);
 	/*----------------------------------------------------------------*/
 }
 
-// Carrega o modo gráfico
+// Carrega o modo grÃ¡fico
 void inicializarAllegro(Controle &c) {
 	al_init();
 	al_set_new_display_flags(ALLEGRO_OPENGL);
@@ -626,10 +806,10 @@ void carregarRecursos(Mapa &m, Controle &c, Formiga &f, Item &i) {
 // Verifica se o jogador venceu
 bool venceu(int a[QUANTIDADE_ARMAZENS][QUANTIDADE_LOCAIS]) {
 	int cont = 0;
-	for(size_t LOCAL = 0; LOCAL < QUANTIDADE_LOCAIS; LOCAL++)
-		if(a[ARMAZEM_1][LOCAL] == SEM_COMIDA)
+	for (size_t LOCAL = 0; LOCAL < QUANTIDADE_LOCAIS; LOCAL++)
+		if (a[ARMAZEM_1][LOCAL] == SEM_COMIDA)
 			cont++;
-	if(cont == 4)
+	if (cont == 4)
 		return true;
 	else
 		return false;
@@ -646,16 +826,17 @@ void fimJogo(Controle &c) {
 	al_draw_text(c.fonte[T50], al_map_rgb(50, 25, 0), x + 530, y + 200, NULL, tempoChar);
 	al_draw_text(c.fonte[T20], al_map_rgb(50, 25, 0), x + 90, y + 400, NULL, "aperte ENTER para continuar");
 	c.jogar = false;
-	if(!al_is_event_queue_empty(c.fila_eventos)) {
+	if (!al_is_event_queue_empty(c.fila_eventos)) {
 		ALLEGRO_EVENT evento;
 		al_wait_for_event(c.fila_eventos, &evento);
-		if(evento.type == ALLEGRO_EVENT_KEY_DOWN) {
-			switch(evento.keyboard.keycode)
+		if (evento.type == ALLEGRO_EVENT_KEY_DOWN) {
+			switch (evento.keyboard.keycode)
 			{
 			case ALLEGRO_KEY_ENTER:
 				c.reiniciar = true;
 			}
-		} else if(evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+		}
+		else if (evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			c.sair = true;
 		}
 	}
@@ -675,6 +856,12 @@ void inicializarVariaveis(Mapa &m, Controle &c, Formiga &f, Item &i) {
 	f.DIRECAO = SUBIR;
 	f.velocidade = 200;
 	f.vazio = true;
+	i.tempoBota = 0.0;
+	i.tempoFinalBota = 0.0;
+	i.tempoFinalTocha = 0.0;
+	i.tempoInicialBota = 0.0;
+	i.tempoInicialTocha = 0.0;
+	i.tempoTocha = 0.0;
 	i.quantidadePa = 0;
 	i.tocha = false;
 	i.bota = false;
@@ -713,15 +900,16 @@ void finalizar(Mapa &m, Controle &c, Formiga &f, Item &i) {
 	al_destroy_bitmap(i.imgTocha);
 }
 
-// Reinicia as variáveis
+// Reinicia as variÃ¡veis
 void inicializarJogo(Mapa &m, Controle &c, Formiga &f, Item &i) {
 	inicializarVariaveis(m, c, f, i);
 	novoMapa(m);
 	posicionarFormiga(m, f);
 	iniciarArmazem(m.armazem);
+	posicionarItens(m, i);
 }
 //
-// FIM DA PARTE DE CÓDIGO ESCRITA POR CARLOS
+// FIM DA PARTE DE CÃ“DIGO ESCRITA POR CARLOS
 
 
 
@@ -729,13 +917,14 @@ void inicializarJogo(Mapa &m, Controle &c, Formiga &f, Item &i) {
 
 
 
-// PARTE DO CÓDIGO ESCRITA POR MATEUS
+// PARTE DO CÃ“DIGO ESCRITA POR MATEUS
 //
-// função para medir tempo e sortear novo mapa
-void medirTempo(bool inicio, Mapa &m, Controle &c, Formiga &f) {
+// funÃ§Ã£o para medir tempo e sortear novo mapa
+void medirTempo(bool inicio, Mapa &m, Controle &c, Formiga &f, Item &i) {
 	if (inicio) {
 		c.tempoInicial = clock();
-	} else {
+	}
+	else {
 		c.tempoFinal = clock();
 		c.tempoTotal -= (c.tempoFinal - c.tempoInicial) / (double)CLOCKS_PER_SEC;
 		c.tempoExecucao += (c.tempoFinal - c.tempoInicial) / (double)CLOCKS_PER_SEC;
@@ -743,9 +932,8 @@ void medirTempo(bool inicio, Mapa &m, Controle &c, Formiga &f) {
 		if (c.tempoTotal < 0) {
 			novoMapa(m);
 			posicionarFormiga(m, f);
-			// FALTA CRIAR A FUNÇÃO QUE DISPÕE OS ARMAZÉNS NO MAPA (MATEUS)
-			// FALTA CRIAR A FUNÇÃO QUE DISPÕE OS ITENS NO MAPA (CAIO) 
-			// UM ITEM DE CADA JA TA LEGAL, E LEMBRE-SE QUE A PA PODE ACUMULAR COM O DO PRÓXIMO MAPA
+			// FALTA CRIAR A FUNÃ‡ÃƒO QUE DISPÃ•E OS ARMAZÃ‰NS NO MAPA (MATEUS)
+			posicionarItens(m, i);
 			c.tempoTotal = TEMPO_MAXIMO;
 		}
 	}
@@ -754,7 +942,7 @@ void pausa(Controle c) {
 
 }
 //
-// FIM DA PARTE DE CÓDIGO ESCRITA POR MATEUS
+// FIM DA PARTE DE CÃ“DIGO ESCRITA POR MATEUS
 
 
 
@@ -762,10 +950,10 @@ void pausa(Controle c) {
 
 
 
-// TANTO A FUNÇÃO MAIN COMO SUAS VARIÁVEIS FORAM MANIPULADAS POR TODO O GRUPO
+// TANTO A FUNÃ‡ÃƒO MAIN COMO SUAS VARIÃVEIS FORAM MANIPULADAS POR TODO O GRUPO
 //
 int main(void) {
-	/*-------------------------------- VARIÁVEIS ------------------------------*/
+	/*-------------------------------- VARIÃVEIS ------------------------------*/
 
 	Mapa m;
 	Formiga f;
@@ -774,30 +962,34 @@ int main(void) {
 
 	/*-------------------------------------------------------------------------*/
 
-	/*------------------------------ INICIALIZAÇÃO ----------------------------*/
-	
+	/*------------------------------ INICIALIZAÃ‡ÃƒO ----------------------------*/
+
 	inicializarAllegro(c);
 	carregarRecursos(m, c, f, i);
 	inicializarJogo(m, c, f, i);
 
 	/*------------------------------ LOOP PRINCIPAL ---------------------------*/
 
-	while(!c.sair) {
+	while (!c.sair) {
 		al_clear_to_color(al_map_rgb(0, 0, 0));
-		if(c.menu) {
+		if (c.menu) {
 			menu(c);
-		} else if (c.jogar) {
-			medirTempo(true, m, c, f);
+		}
+		else if (c.jogar) {
+			tempoItem(true, i);
+			medirTempo(true, m, c, f, i);
 			desenharFrame(m, c, f, i);
-			lerComandos(m, c, f);
-			medirTempo(false, m, c, f);
-		} else if(c.pausa) {
+			lerComandos(m, c, f, i);
+			medirTempo(false, m, c, f, i);
+			tempoItem(false, i);
+		}
+		else if (c.pausa) {
 			pausa(c);
 		}
 
-		if(venceu(m.armazem) && f.vazio) {
+		if (venceu(m.armazem) && f.vazio) {
 			fimJogo(c);
-			if(c.reiniciar)
+			if (c.reiniciar)
 				inicializarJogo(m, c, f, i);
 		}
 		al_flip_display();
