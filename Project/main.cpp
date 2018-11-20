@@ -69,6 +69,12 @@ enum {
 	COMIDA_4, 
 	SEM_COMIDA 
 };
+enum {
+	LOCAL_1,
+	LOCAL_2,
+	LOCAL_3,
+	LOCAL_4
+};
 enum { 
 	POSICAO_1, 
 	POSICAO_2, 
@@ -506,12 +512,36 @@ void desenharFrame(Mapa m, Controle c, Formiga f, Item it) {
 			} else if(m.mapa[i][j] == ARMAZEM_MAPA_1) {
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(m.imgArmazem[DESMORONANDO], x, y, NULL);
+				if(m.armazem[ARMAZEM_1][LOCAL_1])
+					al_draw_bitmap(m.imgComidaAmazem[COMIDA_4], x, y, NULL);
+				if (m.armazem[ARMAZEM_1][LOCAL_2])
+					al_draw_bitmap(m.imgComidaAmazem[COMIDA_3], x, y, NULL);
+				if (m.armazem[ARMAZEM_1][LOCAL_3])
+					al_draw_bitmap(m.imgComidaAmazem[COMIDA_2], x, y, NULL);
+				if (m.armazem[ARMAZEM_1][LOCAL_4])
+					al_draw_bitmap(m.imgComidaAmazem[COMIDA_1], x, y, NULL);
 			} else if(m.mapa[i][j] == ARMAZEM_MAPA_2) {
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(m.imgArmazem[NORMAL], x, y, NULL);
+				if (m.armazem[ARMAZEM_2][LOCAL_1])
+					al_draw_bitmap(m.imgComidaAmazem[COMIDA_4], x, y, NULL);
+				if (m.armazem[ARMAZEM_2][LOCAL_2])
+					al_draw_bitmap(m.imgComidaAmazem[COMIDA_3], x, y, NULL);
+				if (m.armazem[ARMAZEM_2][LOCAL_3])
+					al_draw_bitmap(m.imgComidaAmazem[COMIDA_2], x, y, NULL);
+				if (m.armazem[ARMAZEM_2][LOCAL_4])
+					al_draw_bitmap(m.imgComidaAmazem[COMIDA_1], x, y, NULL);
 			} else if (m.mapa[i][j] == ARMAZEM_MAPA_3) {
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(m.imgArmazem[NORMAL], x, y, NULL);
+				if (m.armazem[ARMAZEM_3][LOCAL_1])
+					al_draw_bitmap(m.imgComidaAmazem[COMIDA_4], x, y, NULL);
+				if (m.armazem[ARMAZEM_3][LOCAL_2])
+					al_draw_bitmap(m.imgComidaAmazem[COMIDA_3], x, y, NULL);
+				if (m.armazem[ARMAZEM_3][LOCAL_3])
+					al_draw_bitmap(m.imgComidaAmazem[COMIDA_2], x, y, NULL);
+				if (m.armazem[ARMAZEM_3][LOCAL_4])
+					al_draw_bitmap(m.imgComidaAmazem[COMIDA_1], x, y, NULL);
 			} else if(m.mapa[i][j] == FORMIGA_VAZIO) {
 				sombraX = x + TILE / 2 - LARGURA;
 				sombraY = y + TILE / 2 + PLACAR - ALTURA;
