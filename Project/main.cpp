@@ -1303,7 +1303,6 @@ void inicializarJogo(Mapa &m, Controle &c, Formiga &f, Item &i) {
 	iniciarArmazem(m.armazem);
 	posicionarItens(m, i);
 	posicionarArmazens(m);
-	inicializarAudio(c);
 }
 
 // função para medir tempo e sortear novo mapa (CARLOS E MATEUS)
@@ -1345,6 +1344,7 @@ int main(void) {
 	inicializarAllegro(c);
 	carregarRecursos(m, c, f, i);
 	inicializarJogo(m, c, f, i);
+	inicializarAudio(c);
 
 	/*------------------------------ LOOP PRINCIPAL ---------------------------*/
 
