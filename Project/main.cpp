@@ -542,7 +542,7 @@ void iniciarArmazem(int armazem[QUANTIDADE_ARMAZENS][QUANTIDADE_LOCAIS]) {
 	}
 }
 
-// Gera um novo mapa (CARLOS)
+// Gera um novo mapa (CARLOS)(CÓDIDO TIRADO DO EXEMPLO APRESENTADO PELO PROFESSOR E ADAPTADO PARA NOSSO JOGO)
 void novoMapa(Mapa &m) {
 	list <pair <int, int> > drillers;
 	int **map = NULL;
