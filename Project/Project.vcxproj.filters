@@ -22,4 +22,18 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="defs.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="menu.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="funcoes_basicas.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
