@@ -1,4 +1,10 @@
-#pragma once
+/*
+* DESCRI√á√ÉO: Jogo criado para a disciplina de Algoritmos e Programa√ß√£o.
+* AUTORES:
+* Carlos Eduardo de Borba Machado
+* Caio Gonzaga Bernils
+* Mateus Luis Ropke Lauer
+*/
 
 // BIBLIOTECAS
 //
@@ -12,11 +18,91 @@
 #include <time.h>
 #include <string>
 //
-#include "menu.h"
+
+using namespace std;
+
+// CONSTANTES
+//
+#define LARGURA 960
+#define ALTURA 740
+
+#define TEMPO_MAXIMO 45.0
+
+#define QUANTIDADE_ARMAZENS 3
+#define QUANTIDADE_LOCAIS 4
 //
 
+// ENUMS
+enum {
+	PAREDE, CAMINHO, ITEM_PA, ITEM_BOTA, ITEM_TOCHA, ITEM_KIT, ARMAZEM_MAPA_1, ARMAZEM_MAPA_2, ARMAZEM_MAPA_3, FORMIGA_VAZIO, FORMIGA_CHEIO, BAD_ROCK
+};
+enum {
+	ARMAZEM_1, ARMAZEM_2, ARMAZEM_3
+};
+enum {
+	SELECIONADO, NAO_SELECIONADO
+};
+enum {
+	NORMAL,
+	DESMORONANDO
+};
+enum {
+	PEQUENA, GRANDE
+};
+enum {
+	COMIDA_1, COMIDA_2, COMIDA_3, COMIDA_4, SEM_COMIDA
+};
+enum {
+	LOCAL_1, LOCAL_2, LOCAL_3, LOCAL_4
+};
+enum {
+	POSICAO_1, POSICAO_2, POSICAO_3, POSICAO_4
+};
+enum {
+	SUBIR, DESCER, ESQUERDA, DIREITA, PEGAR, SAIR, NADA
+};
+enum {
+	T10, T20, T30, T40, T50, T60, T70, T80, T90, T100, T110, T120, T130, T140, T150, TOTAL_FONTES
+};
+//
+
+/*-------------------------------- STRUCTS ------------------------------------*/
+
+typedef struct Controle {
+	bool menu, jogar, pausa, sair, reiniciar, musica, sfx, venceu;
+	double tempoTotal, tempoExecucao;
+	int opcao;
+	clock_t tempoInicial, tempoFinal;
+	ALLEGRO_EVENT_QUEUE *fila_eventos;
+	ALLEGRO_FONT *fonte[TOTAL_FONTES];
+	ALLEGRO_DISPLAY *display;
+	ALLEGRO_BITMAP *imgPlaca, *imgMenu, *imgBota, *imgTocha, *imgPa, *imgRelogio, *imgSelecao[2], *imgRecordes;
+	ALLEGRO_SAMPLE_INSTANCE *tema;
+	ALLEGRO_SAMPLE *somTema, *somEnter, *somSelecionar, *somCavar, *somTocha, *somKit, *somPa, *somFolha, *somCouro, *somCaminhada, *somVitoria, *somTerremoto;
+};
+
+typedef struct Formiga {
+	int comidaAtual, x, y, DIRECAO, tempoVelocidade, velocidade;
+	bool vazio;
+	ALLEGRO_BITMAP *imgFormiga[4];
+};
+
+typedef struct Mapa {
+	int armazem[QUANTIDADE_ARMAZENS][QUANTIDADE_LOCAIS], **mapa, x, y;
+	ALLEGRO_BITMAP *imgParede, *imgCaminho, *imgBackground, *imgComida[4], *imgSombra[2], *imgComidaAmazem[4], *imgArmazem[2];
+};
+
+typedef struct Item {
+	int quantidadePa;
+	bool tocha, bota;
+	double tempoTocha, tempoFinalTocha, tempoInicialTocha, tempoBota, tempoFinalBota, tempoInicialBota;
+	ALLEGRO_BITMAP *imgPa, *imgBota, *imgTocha, *imgKit;
+};
+
+/*-----------------------------------------------------------------------------*/
+
 // Inicializa todas as variaveis do programa e atribui seus valores (CARLOS)
-void inicializarVariaveis(Mapa& m, Controle& c, Formiga& f, Item& i) {
+void inicializarVariaveis(Mapa &m, Controle &c, Formiga &f, Item &i) {
 	c.opcao = NULL;
 	c.menu = true;
 	c.jogar = false;
@@ -46,7 +132,7 @@ void inicializarVariaveis(Mapa& m, Controle& c, Formiga& f, Item& i) {
 }
 
 //Carrega os recursos do jogo (CARLOS)
-void carregarRecursos(Mapa& m, Controle& c, Formiga& f, Item& i) {
+void carregarRecursos(Mapa &m, Controle &c, Formiga &f, Item &i) {
 	int INTERVALO = 10;
 	c.somTema = al_load_sample("res/audio/TEMA.ogg");
 	c.somCavar = al_load_sample("res/audio/PA.ogg");
@@ -99,7 +185,7 @@ void carregarRecursos(Mapa& m, Controle& c, Formiga& f, Item& i) {
 }
 
 // Finaliza o programa, destruindo todos os objetos criados (CARLOS)
-void finalizar(Mapa& m, Controle& c, Formiga& f, Item& i) {
+void finalizar(Mapa &m, Controle &c, Formiga &f, Item &i) {
 	al_destroy_display(c.display);
 	al_destroy_event_queue(c.fila_eventos);
 	al_destroy_sample(c.somTema);
@@ -151,13 +237,13 @@ void finalizar(Mapa& m, Controle& c, Formiga& f, Item& i) {
 }
 
 // Inicia o tempo dos itens (CARLOS E CAIO)
-void tempoItem(bool inicio, Item& i) {
+void tempoItem(bool inicio, Item &i) {
 	if (inicio) {
 		i.tempoInicialBota = clock();
 		i.tempoInicialTocha = clock();
 	}
 	else {
-		// Decorre o tempo para que os itens n„o se tornem eternos
+		// Decorre o tempo para que os itens n√£o se tornem eternos
 		i.tempoFinalBota = clock();
 		i.tempoFinalTocha = clock();
 		i.tempoBota -= (i.tempoFinalBota - i.tempoInicialBota) / (double)CLOCKS_PER_SEC;
@@ -165,8 +251,14 @@ void tempoItem(bool inicio, Item& i) {
 	}
 }
 
-// Sorteia a posiÁ„o dos itens no Mapa (CARLOS E CAIO)
-void posicionarItens(Mapa& m, Item& i) {
+// Respons√°vel por tocar o sample (CARLOS)
+void tocarSample(ALLEGRO_SAMPLE *sample, bool sfx) {
+	if (sfx)
+		al_play_sample(sample, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+}
+
+// Sorteia a posi√ß√£o dos itens no Mapa (CARLOS E CAIO)
+void posicionarItens(Mapa &m, Item &i) {
 	bool sortear = true;
 	int x, y;
 	srand(time(NULL));
@@ -181,6 +273,257 @@ void posicionarItens(Mapa& m, Item& i) {
 		}
 		sortear = true;
 	}
+}
+
+// Faz o menu principal (CARLOS, MATEUS E CAIO)
+void menuPrincipal(Controle &c, const char *st1, const char *st2, const char *st3, const char *st4, bool &recordes, bool &musica, bool principal) {
+	const int JOGAR = 0, RECORDES = 1, SOM = 2, SAIR = 3;
+	const int MUSICA = 0, SFX = 1, VOLTAR = 2;
+	int x = 0, y = -10;
+	if (!al_is_event_queue_empty(c.fila_eventos)) {
+		ALLEGRO_EVENT evento;
+		al_wait_for_event(c.fila_eventos, &evento);
+		if (evento.type == ALLEGRO_EVENT_KEY_CHAR) {
+			switch (evento.keyboard.keycode)
+			{
+				// Caso a tecla W ou Seta para cima forem pressionadas, seleciona a op√ß√£o de cima
+			case ALLEGRO_KEY_W:
+			case ALLEGRO_KEY_UP:
+				tocarSample(c.somSelecionar, c.sfx);
+				c.opcao--;
+				if (c.opcao < JOGAR)
+					c.opcao = JOGAR;
+				break;
+				// Caso a tecla S ou Seta para baixo forem pressionadas, seleciona a op√ß√£o de baixo
+			case ALLEGRO_KEY_S:
+			case ALLEGRO_KEY_DOWN:
+				tocarSample(c.somSelecionar, c.sfx);
+				c.opcao++;
+				if (c.opcao > SAIR)
+					c.opcao = SAIR;
+				break;
+			case ALLEGRO_KEY_ENTER:
+			case ALLEGRO_KEY_SPACE:
+				tocarSample(c.somEnter, c.sfx);
+				// Caso as teclas Enter ou Espa√ßo forem pressionadas em Inciar, finaliza o Menu e inicia o jogo
+				if (c.opcao == JOGAR) {
+					c.menu = false;
+					c.jogar = true;
+				}
+				// Caso as teclas Enter ou Espa√ßo forem pressionadas em Recordes, entra no Menu de recordes
+				else if (c.opcao == RECORDES) {
+					recordes = true;
+				}
+				// Caso as teclas Enter ou Espa√ßo forem pressionadas em Musica, entra no Menu de musicas
+				else if (c.opcao == SOM) {
+					musica = true;
+					c.opcao = MUSICA;
+				}
+				// Caso as teclas Enter ou Espa√ßo forem pressionadas em Sair, finaliza o jogo
+				else if (c.opcao == SAIR) {
+					if (principal)
+						c.sair = true;
+					else
+						c.reiniciar = true;
+				}
+				break;
+			}
+		}
+	}
+	// Posiciona as op√ß√µes do Menu (CARLOS, MATEUS E CAIO)
+	if (c.opcao == JOGAR) {
+		al_draw_bitmap(c.imgSelecao[SELECIONADO], x + 305, y + 350, NULL);
+		al_draw_text(c.fonte[T50], al_map_rgb(0, 0, 0), x + 365, y + 360, NULL, st1);
+	}
+	else {
+		al_draw_bitmap(c.imgSelecao[NAO_SELECIONADO], x + 305, y + 350, NULL);
+		al_draw_text(c.fonte[T50], al_map_rgb(255, 255, 255), x + 365, y + 360, NULL, st1);
+	}
+
+	if (c.opcao == RECORDES) {
+		al_draw_bitmap(c.imgSelecao[SELECIONADO], x + 305, y + 450, NULL);
+		al_draw_text(c.fonte[T50], al_map_rgb(0, 0, 0), x + 350, y + 460, NULL, st2);
+	}
+	else {
+		al_draw_bitmap(c.imgSelecao[NAO_SELECIONADO], x + 305, y + 450, NULL);
+		al_draw_text(c.fonte[T50], al_map_rgb(255, 255, 255), x + 350, y + 460, NULL, st2);
+	}
+
+	if (c.opcao == SOM) {
+		al_draw_bitmap(c.imgSelecao[SELECIONADO], x + 305, y + 550, NULL);
+		al_draw_text(c.fonte[T50], al_map_rgb(0, 0, 0), x + 400, y + 560, NULL, st3);
+	}
+	else {
+		al_draw_bitmap(c.imgSelecao[NAO_SELECIONADO], x + 305, y + 550, NULL);
+		al_draw_text(c.fonte[T50], al_map_rgb(255, 255, 255), x + 400, y + 560, NULL, st3);
+	}
+
+	if (c.opcao == SAIR) {
+		al_draw_bitmap(c.imgSelecao[SELECIONADO], x + 305, y + 650, NULL);
+		al_draw_text(c.fonte[T50], al_map_rgb(0, 0, 0), x + 425, y + 660, NULL, st4);
+	}
+	else {
+		al_draw_bitmap(c.imgSelecao[NAO_SELECIONADO], x + 305, y + 650, NULL);
+		al_draw_text(c.fonte[T50], al_map_rgb(255, 255, 255), x + 425, y + 660, NULL, st4);
+	}
+}
+
+// Faz o menu recordes (CARLOS, MATEUS E CAIO)
+void menuRecordes(Controle c, bool &recordes) {
+	const int JOGAR = 0, RECORDES = 1, SOM = 2, SAIR = 3;
+	const int MUSICA = 0, SFX = 1, VOLTAR = 2;
+	int x = 0, y = 0;
+	if (!al_is_event_queue_empty(c.fila_eventos)) {
+		ALLEGRO_EVENT evento;
+		al_wait_for_event(c.fila_eventos, &evento);
+		if (evento.type == ALLEGRO_EVENT_KEY_CHAR) {
+			switch (evento.keyboard.keycode)
+			{
+			case ALLEGRO_KEY_ENTER:
+			case ALLEGRO_KEY_SPACE:
+				tocarSample(c.somEnter, c.sfx);
+				recordes = false;
+				c.opcao = JOGAR;
+				break;
+			}
+		}
+	}
+	// Posiciona as op√ß√µes do Menu
+	al_draw_bitmap(c.imgRecordes, x + LARGURA / 2 - 145, y + 330, NULL);
+	al_draw_multiline_text(c.fonte[T20], al_map_rgb(0, 0, 0), x + 365, y + 420, 250, 35.0, NULL, "this functionality has not been implemented yet");
+	al_draw_bitmap(c.imgSelecao[SELECIONADO], x + 305, y + 650, NULL);
+	al_draw_text(c.fonte[T50], al_map_rgb(0, 0, 0), x + 400, y + 660, NULL, "back");
+}
+
+// Faz o menu musica (CARLOS, MATEUS E CAIO)
+void menuMusica(Controle &c, bool &musica) {
+	const int JOGAR = 0, RECORDES = 1, SOM = 2, SAIR = 3;
+	const int MUSICA = 0, SFX = 1, VOLTAR = 2;
+	int x = 0, y = 40;
+	if (!al_is_event_queue_empty(c.fila_eventos)) {
+		ALLEGRO_EVENT evento;
+		al_wait_for_event(c.fila_eventos, &evento);
+		if (evento.type == ALLEGRO_EVENT_KEY_CHAR) {
+			switch (evento.keyboard.keycode)
+			{
+			case ALLEGRO_KEY_W:
+			case ALLEGRO_KEY_UP:
+				tocarSample(c.somSelecionar, c.sfx);
+				c.opcao--;
+				if (c.opcao < MUSICA)
+					c.opcao = MUSICA;
+				break;
+			case ALLEGRO_KEY_S:
+			case ALLEGRO_KEY_DOWN:
+				tocarSample(c.somSelecionar, c.sfx);
+				c.opcao++;
+				if (c.opcao > VOLTAR)
+					c.opcao = VOLTAR;
+				break;
+			case ALLEGRO_KEY_ENTER:
+			case ALLEGRO_KEY_SPACE:
+				tocarSample(c.somEnter, c.sfx);
+				if (c.opcao == MUSICA) {
+					if (c.musica)
+						c.musica = false;
+					else
+						c.musica = true;
+				}
+				else if (c.opcao == SFX) {
+					if (c.sfx)
+						c.sfx = false;
+					else
+						c.sfx = true;
+				}
+				else if (c.opcao == VOLTAR) {
+					musica = false;
+					c.opcao = JOGAR;
+				}
+				break;
+			}
+		}
+	}
+	// Posiciona as op√ß√µes do Menu
+	if (c.opcao == MUSICA) {
+		al_draw_bitmap(c.imgSelecao[SELECIONADO], x + 305, y + 350, NULL);
+		if (c.musica)
+			al_draw_text(c.fonte[T50], al_map_rgb(0, 0, 0), x + 350, y + 360, NULL, "music: on");
+		else
+			al_draw_text(c.fonte[T50], al_map_rgb(0, 0, 0), x + 350, y + 360, NULL, "music: off");
+	}
+	else {
+		al_draw_bitmap(c.imgSelecao[NAO_SELECIONADO], x + 305, y + 350, NULL);
+		if (c.musica)
+			al_draw_text(c.fonte[T50], al_map_rgb(255, 255, 255), x + 350, y + 360, NULL, "music: on");
+		else
+			al_draw_text(c.fonte[T50], al_map_rgb(255, 255, 255), x + 350, y + 360, NULL, "music: off");
+	}
+
+	if (c.opcao == SFX) {
+		al_draw_bitmap(c.imgSelecao[SELECIONADO], x + 305, y + 450, NULL);
+		if (c.sfx)
+			al_draw_text(c.fonte[T50], al_map_rgb(0, 0, 0), x + 390, y + 460, NULL, "sfx: on");
+		else
+			al_draw_text(c.fonte[T50], al_map_rgb(0, 0, 0), x + 390, y + 460, NULL, "sfx: off");
+	}
+	else {
+		al_draw_bitmap(c.imgSelecao[NAO_SELECIONADO], x + 305, y + 450, NULL);
+		if (c.sfx)
+			al_draw_text(c.fonte[T50], al_map_rgb(255, 255, 255), x + 390, y + 460, NULL, "sfx: on");
+		else
+			al_draw_text(c.fonte[T50], al_map_rgb(255, 255, 255), x + 390, y + 460, NULL, "sfx: off");
+	}
+
+	if (c.opcao == VOLTAR) {
+		al_draw_bitmap(c.imgSelecao[SELECIONADO], x + 305, y + 550, NULL);
+		al_draw_text(c.fonte[T50], al_map_rgb(0, 0, 0), x + 400, y + 560, NULL, "back");
+	}
+	else {
+		al_draw_bitmap(c.imgSelecao[NAO_SELECIONADO], x + 305, y + 550, NULL);
+		al_draw_text(c.fonte[T50], al_map_rgb(255, 255, 255), x + 400, y + 560, NULL, "back");
+	}
+}
+
+// Apresenta a tela de menu ao jogador (CARLOS E CAIO)
+void menu(Controle &c) {
+	static bool recordes = false, musica = false;
+	al_draw_bitmap(c.imgMenu, 0, 0, NULL);
+	// Entra no Menu de Recordes
+	if (recordes) {
+		menuRecordes(c, recordes);
+	}
+	// Entra  no menu m√∫sica
+	else if (musica) {
+		menuMusica(c, musica);
+	}
+	else {
+		menuPrincipal(c, "   play", "hi-scores", "sound", "exit", recordes, musica, true);
+	}
+}
+
+// Menus de pausa (CARLOS E MATEUS)
+void pausa(Mapa &m, Controle &c, Formiga &f, Item &i) {
+	static bool recordes = false, musica = false;
+	al_draw_bitmap(c.imgMenu, 0, 0, NULL);
+	// Entra no Menu de Recordes
+	if (recordes) {
+		menuRecordes(c, recordes);
+	}
+	// Entra  no menu m√∫sica
+	else if (musica) {
+		menuMusica(c, musica);
+	}
+	else {
+		menuPrincipal(c, "continue", "hi-scores", "music", "back", recordes, musica, false);
+	}
+}
+
+// Verifica se a formiga est√° ou n√£o com comida (CARLOS)
+void formigaAtual(Mapa &m, Formiga f) {
+	if (f.vazio)
+		m.mapa[f.y][f.x] = FORMIGA_VAZIO;
+	else
+		m.mapa[f.y][f.x] = FORMIGA_CHEIO;
 }
 
 // Inicializa os armazens (CARLOS)
@@ -199,16 +542,16 @@ void iniciarArmazem(int armazem[QUANTIDADE_ARMAZENS][QUANTIDADE_LOCAIS]) {
 	}
 }
 
-// Gera um novo mapa (CARLOS)(C”DIDO TIRADO DO EXEMPLO APRESENTADO PELO PROFESSOR E ADAPTADO PARA NOSSO JOGO)
-void novoMapa(Mapa& m) {
-	std::list <std::pair <int, int> > drillers;
-	int** map = NULL;
+// Gera um novo mapa (CARLOS)(C√ìDIDO TIRADO DO EXEMPLO APRESENTADO PELO PROFESSOR E ADAPTADO PARA NOSSO JOGO)
+void novoMapa(Mapa &m) {
+	list <pair <int, int> > drillers;
+	int **map = NULL;
 	int qtdCaminhos;
 	bool novoMapa = true;
 
 	srand(time(NULL));
 
-	// Verifica se o tamanho da matriz È par para encaixar na textura na hr da impress„o.
+	// Verifica se o tamanho da matriz √© par para encaixar na textura na hr da impress√£o.
 	m.x = 15 + (rand() % 8);
 	if (m.x % 2 != 0)
 		m.x++;
@@ -216,10 +559,10 @@ void novoMapa(Mapa& m) {
 	if (m.y % 2 != 0)
 		m.y++;
 
-	// Loop para criar o mapa, onde ele fica recriando atÈ que saia um mapa com uma quantidade desej·vel de corredores.
+	// Loop para criar o mapa, onde ele fica recriando at√© que saia um mapa com uma quantidade desej√°vel de corredores.
 	do {
 		qtdCaminhos = 0;
-		map = new int* [m.y];
+		map = new int *[m.y];
 
 		for (size_t y = 0; y < m.y; y++)
 			map[y] = new int[m.x];
@@ -228,10 +571,10 @@ void novoMapa(Mapa& m) {
 			for (size_t y = 0; y < m.y; y++)
 				map[y][x] = PAREDE;
 
-		drillers.push_back(std::make_pair(m.x / 2, m.y / 2));
+		drillers.push_back(make_pair(m.x / 2, m.y / 2));
 
 		while (drillers.size() > 0) {
-			std::list <std::pair <int, int> >::iterator n, _n, temp;
+			list <pair <int, int> >::iterator n, _n, temp;
 			n = drillers.begin();
 			_n = drillers.end();
 			while (n != _n) {
@@ -275,16 +618,16 @@ void novoMapa(Mapa& m) {
 					n = drillers.erase(n);
 				}
 				else {
-					drillers.push_back(std::make_pair((*n).first, (*n).second));
+					drillers.push_back(make_pair((*n).first, (*n).second));
 					if (rand() % 2)
-						drillers.push_back(std::make_pair((*n).first, (*n).second));
+						drillers.push_back(make_pair((*n).first, (*n).second));
 					map[(*n).second][(*n).first] = CAMINHO;
 					++n;
 				}
 			}
 		}
 
-		// faz a contagem da quantidade de CAMINHOS para que n„o gere um mapa muito pequeno
+		// faz a contagem da quantidade de CAMINHOS para que n√£o gere um mapa muito pequeno
 		for (size_t x = 0; x < m.x; x++)
 			for (size_t y = 0; y < m.y; y++)
 				if (map[y][x] == CAMINHO)
@@ -300,7 +643,7 @@ void novoMapa(Mapa& m) {
 	m.x += 2;
 	m.y += 2;
 
-	m.mapa = new int* [m.y];
+	m.mapa = new int *[m.y];
 
 	for (size_t y = 0; y < m.y; y++)
 		m.mapa[y] = new int[m.x];
@@ -317,7 +660,7 @@ void novoMapa(Mapa& m) {
 }
 
 // Colcoa uma nova formiga no mapa (CARLOS)
-void posicionarFormiga(Mapa& m, Formiga& f) {
+void posicionarFormiga(Mapa &m, Formiga &f) {
 	bool sortear = true;
 	srand(time(NULL));
 	while (sortear) {
@@ -333,12 +676,12 @@ void posicionarFormiga(Mapa& m, Formiga& f) {
 	}
 }
 
-// FunÁ„o que verifica se vai retirar ou colocar a comida no armazÈm (CARLOS)
-void verificarArmazem(Formiga& f, Mapa& m, int ARMAZEM) {
+// Fun√ß√£o que verifica se vai retirar ou colocar a comida no armaz√©m (CARLOS)
+void verificarArmazem(Formiga &f, Mapa &m, int ARMAZEM) {
 	int LOCAL;
 	bool retirar = false;
 
-	if (f.comidaAtual == SEM_COMIDA) { // Se a formiga n„o tiver segurando comida, significa que ela vai pegar do armazÈm
+	if (f.comidaAtual == SEM_COMIDA) { // Se a formiga n√£o tiver segurando comida, significa que ela vai pegar do armaz√©m
 		for (LOCAL = LOCAL_4; LOCAL >= LOCAL_1; LOCAL--) {
 			if (m.armazem[ARMAZEM][LOCAL] != SEM_COMIDA) {
 				f.comidaAtual = m.armazem[ARMAZEM][LOCAL];
@@ -349,7 +692,7 @@ void verificarArmazem(Formiga& f, Mapa& m, int ARMAZEM) {
 			}
 		}
 	}
-	else { // Se j· tiver, ela vai colocar no armazÈm
+	else { // Se j√° tiver, ela vai colocar no armaz√©m
 		for (LOCAL = LOCAL_1; LOCAL <= LOCAL_4; LOCAL++) {
 			if (m.armazem[ARMAZEM][LOCAL] == SEM_COMIDA) {
 				if (LOCAL == LOCAL_1)
@@ -369,9 +712,9 @@ void verificarArmazem(Formiga& f, Mapa& m, int ARMAZEM) {
 	}
 }
 
-// Nessa funÁ„o s„o executados os comandos do jogo (CARLOS, CAIO E MATEUS)
-// Obs.: Todos os coment·rios dessa funÁ„o servem para todas as posiÁıes pressionadas, apenas para reduÁ„o de linhas
-void lerComandos(Mapa& m, Controle& c, Formiga& f, Item& i) {
+// Nessa fun√ß√£o s√£o executados os comandos do jogo (CARLOS, CAIO E MATEUS)
+// Obs.: Todos os coment√°rios dessa fun√ß√£o servem para todas as posi√ß√µes pressionadas, apenas para redu√ß√£o de linhas
+void lerComandos(Mapa &m, Controle &c, Formiga &f, Item &i) {
 	if (!al_is_event_queue_empty(c.fila_eventos)) {
 		ALLEGRO_EVENT evento;
 		al_wait_for_event(c.fila_eventos, &evento);
@@ -386,41 +729,41 @@ void lerComandos(Mapa& m, Controle& c, Formiga& f, Item& i) {
 						m.mapa[f.y - 1][f.x] == ITEM_BOTA ||
 						m.mapa[f.y - 1][f.x] == ITEM_TOCHA ||
 						m.mapa[f.y - 1][f.x] == ITEM_KIT) {
-						// Verifica se nessa posiÁ„o existe uma P¡
+						// Verifica se nessa posi√ß√£o existe uma P√Å
 						if (m.mapa[f.y - 1][f.x] == ITEM_PA) {
-							// Ao pegar o item P¡, acrescenta mais um no contador
+							// Ao pegar o item P√Å, acrescenta mais um no contador
 							tocarSample(c.somPa, c.sfx);
 							i.quantidadePa++;
 						}
-						// Verifica se nessa posiÁ„o existe uma BOTA
+						// Verifica se nessa posi√ß√£o existe uma BOTA
 						if (m.mapa[f.y - 1][f.x] == ITEM_BOTA) {
-							// Caso ele j· obtiver a BOTA, acrescenta 30 segundos
+							// Caso ele j√° obtiver a BOTA, acrescenta 30 segundos
 							tocarSample(c.somCouro, c.sfx);
 							if (i.bota) {
 								i.tempoBota += 30.0;
 							}
-							// Ao pegar o item BOTA, inicia a funÁ„o do item
+							// Ao pegar o item BOTA, inicia a fun√ß√£o do item
 							else {
 								i.bota = true;
 								i.tempoBota = 30.0;
 							}
 						}
-						// Verifica se nessa posiÁ„o existe uma TOCHA.
+						// Verifica se nessa posi√ß√£o existe uma TOCHA.
 						if (m.mapa[f.y - 1][f.x] == ITEM_TOCHA) {
-							// Caso ele j· obtiver a TOCHA, acrescenta 30 segundos
+							// Caso ele j√° obtiver a TOCHA, acrescenta 30 segundos
 							tocarSample(c.somTocha, c.sfx);
 							if (i.tocha) {
 								i.tempoTocha += 30.0;
 							}
-							// Ao pegar o item TOCHA, inicia a funÁ„o do item
+							// Ao pegar o item TOCHA, inicia a fun√ß√£o do item
 							else {
 								i.tocha = true;
 								i.tempoTocha = 30.0;
 							}
 						}
-						// Verifica se nessa posiÁ„o existe um KIT DE REPAROS
+						// Verifica se nessa posi√ß√£o existe um KIT DE REPAROS
 						if (m.mapa[f.y - 1][f.x] == ITEM_KIT) {
-							// Inicia a funÁ„o do item, acrescenta 30 segundos no tempo atÈ o prÛximo terremoto
+							// Inicia a fun√ß√£o do item, acrescenta 30 segundos no tempo at√© o pr√≥ximo terremoto
 							tocarSample(c.somKit, c.sfx);
 							c.tempoTotal += 30;
 						}
@@ -577,11 +920,11 @@ void lerComandos(Mapa& m, Controle& c, Formiga& f, Item& i) {
 			case ALLEGRO_KEY_ENTER:
 			case ALLEGRO_KEY_SPACE:
 				// Pega ou deposita comida
-				// Se alguma posiÁ„o ao redor da formiga for armazÈm ela chama a funÁ„o verificar armazÈm
+				// Se alguma posi√ß√£o ao redor da formiga for armaz√©m ela chama a fun√ß√£o verificar armaz√©m
 				if (m.mapa[f.y + 1][f.x] == ARMAZEM_MAPA_1 && f.DIRECAO == DESCER ||
 					m.mapa[f.y - 1][f.x] == ARMAZEM_MAPA_1 && f.DIRECAO == SUBIR ||
 					m.mapa[f.y][f.x + 1] == ARMAZEM_MAPA_1 && f.DIRECAO == DIREITA ||
-					m.mapa[f.y][f.x - 1] == ARMAZEM_MAPA_1 && f.DIRECAO == ESQUERDA) {		// O ARMAZ…M 1 … O INICIAL (DESMORONANDO)
+					m.mapa[f.y][f.x - 1] == ARMAZEM_MAPA_1 && f.DIRECAO == ESQUERDA) {		// O ARMAZ√âM 1 √â O INICIAL (DESMORONANDO)
 					tocarSample(c.somFolha, c.sfx);
 					verificarArmazem(f, m, ARMAZEM_1);
 				}
@@ -599,11 +942,11 @@ void lerComandos(Mapa& m, Controle& c, Formiga& f, Item& i) {
 					tocarSample(c.somFolha, c.sfx);
 					verificarArmazem(f, m, ARMAZEM_3);
 				}
-				// Verifica se a frente da formiga existe parede, se sim, utiliza o item P¡ destruindo a parede selecionada
+				// Verifica se a frente da formiga existe parede, se sim, utiliza o item P√Å destruindo a parede selecionada
 				if (m.mapa[f.y - 1][f.x] == PAREDE && f.DIRECAO == SUBIR && i.quantidadePa > 0) {
 					tocarSample(c.somCavar, c.sfx);
 					m.mapa[f.y - 1][f.x] = CAMINHO;
-					// Diminui a quantidade de P¡S restantes
+					// Diminui a quantidade de P√ÅS restantes
 					i.quantidadePa--;
 				}
 				if (m.mapa[f.y + 1][f.x] == PAREDE && f.DIRECAO == DESCER && i.quantidadePa > 0) {
@@ -624,35 +967,35 @@ void lerComandos(Mapa& m, Controle& c, Formiga& f, Item& i) {
 			}
 		}
 	}
-	// Inicia a funÁ„o do item BOTA, aumentando a velocidade m·xima
+	// Inicia a fun√ß√£o do item BOTA, aumentando a velocidade m√°xima
 	if (i.bota) {
 		f.velocidade = 100;
 	}
-	// Velocidade padr„o
+	// Velocidade padr√£o
 	else {
 		f.velocidade = 200;
 	}
-	// Desabilita o efeito do item BOTA apÛs o tÈrmino do tempo
+	// Desabilita o efeito do item BOTA ap√≥s o t√©rmino do tempo
 	if (i.tempoBota < 0.0) {
 		i.bota = false;
 	}
-	// Desabilita o efeito do item TOCHA apÛs o tÈrmino do tempo
+	// Desabilita o efeito do item TOCHA ap√≥s o t√©rmino do tempo
 	if (i.tempoTocha < 0.0) {
 		i.tocha = false;
 	}
 }
 
-// Nessa funÁ„o a matriz È percorrida e os n˙meros s„o substituidos (CARLOS)
+// Nessa fun√ß√£o a matriz √© percorrida e os n√∫meros s√£o substituidos (CARLOS)
 void desenharFrame(Mapa m, Controle c, Formiga f, Item it) {
 	const int TILE = 40;
 	const int PLACAR = 100;
-	std::string tempoString = std::to_string((int)c.tempoTotal);
+	string tempoString = to_string((int)c.tempoTotal);
 	char const* tempoChar = tempoString.c_str();
-	std::string tempoStringTocha = std::to_string((int)it.tempoTocha);
+	string tempoStringTocha = to_string((int)it.tempoTocha);
 	char const* tempoTocha = tempoStringTocha.c_str();
-	std::string tempoStringBota = std::to_string((int)it.tempoBota);
+	string tempoStringBota = to_string((int)it.tempoBota);
 	char const* tempoBota = tempoStringBota.c_str();
-	std::string paString = std::to_string((int)it.quantidadePa);
+	string paString = to_string((int)it.quantidadePa);
 	char const* qtdPa = paString.c_str();
 	int x = (LARGURA / 2) - ((m.x * TILE) / 2), y = (PLACAR / 2) + (ALTURA / 2) - ((m.y * TILE) / 2);
 	int sombraX, sombraY;
@@ -668,7 +1011,7 @@ void desenharFrame(Mapa m, Controle c, Formiga f, Item it) {
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 			}
-			// Renderiza a imagem do Item P·
+			// Renderiza a imagem do Item P√°
 			else if (m.mapa[i][j] == ITEM_PA) {
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(it.imgPa, x, y, NULL);
@@ -692,7 +1035,7 @@ void desenharFrame(Mapa m, Controle c, Formiga f, Item it) {
 			else if (m.mapa[i][j] == ARMAZEM_MAPA_1) {
 				al_draw_bitmap(m.imgCaminho, x, y, NULL);
 				al_draw_bitmap(m.imgArmazem[DESMORONANDO], x, y, NULL);
-				// Renderiza a pilha de comidas dentro do armazÈm
+				// Renderiza a pilha de comidas dentro do armaz√©m
 				if (m.armazem[ARMAZEM_1][LOCAL_1] == COMIDA_1)
 					al_draw_bitmap(m.imgComidaAmazem[COMIDA_1], x, y + 19, NULL);
 				else if (m.armazem[ARMAZEM_1][LOCAL_1] == COMIDA_2)
@@ -827,10 +1170,10 @@ void desenharFrame(Mapa m, Controle c, Formiga f, Item it) {
 		y += TILE;
 		x = (LARGURA / 2) - ((m.x * TILE) / 2);
 	}
-	//Aumenta o tamanho da vis„o da formiga, efeito do item TOCHA
+	//Aumenta o tamanho da vis√£o da formiga, efeito do item TOCHA
 	if (it.tocha)
 		al_draw_bitmap(m.imgSombra[GRANDE], sombraX, sombraY, NULL);
-	//Renderiza o efeito que impede a vis„o da formiga
+	//Renderiza o efeito que impede a vis√£o da formiga
 	else
 		al_draw_bitmap(m.imgSombra[PEQUENA], sombraX, sombraY, NULL);
 	/*---------------------------- HUD -------------------------------*/
@@ -860,8 +1203,8 @@ void desenharFrame(Mapa m, Controle c, Formiga f, Item it) {
 	/*----------------------------------------------------------------*/
 }
 
-// Carrega o modo gr·fico (CARLOS)
-void inicializarAllegro(Controle& c) {
+// Carrega o modo gr√°fico (CARLOS)
+void inicializarAllegro(Controle &c) {
 	al_init();
 	al_set_new_display_flags(ALLEGRO_OPENGL);
 	c.display = al_create_display(LARGURA, ALTURA);
@@ -894,9 +1237,9 @@ bool venceu(int a[QUANTIDADE_ARMAZENS][QUANTIDADE_LOCAIS]) {
 }
 
 // Tela de fim de jogo (CARLOS)
-void fimJogo(Controle& c) {
+void fimJogo(Controle &c) {
 	int x = 180, y = 260;
-	std::string tempoString = std::to_string(c.tempoExecucao);
+	string tempoString = to_string(c.tempoExecucao);
 	char const* tempoChar = tempoString.c_str();
 	if (c.venceu) {
 		tocarSample(c.somVitoria, c.sfx);
@@ -924,8 +1267,8 @@ void fimJogo(Controle& c) {
 	}
 }
 
-// Sorteia os armazÈm pelo jogo (CARLOS E MATEUS)
-void posicionarArmazens(Mapa& m) {
+// Sorteia os armaz√©m pelo jogo (CARLOS E MATEUS)
+void posicionarArmazens(Mapa &m) {
 	bool sorteia = true;
 	int x, y;
 	for (size_t ARMAZEM = ARMAZEM_MAPA_1; ARMAZEM <= ARMAZEM_MAPA_3; ARMAZEM++) {
@@ -946,14 +1289,14 @@ void posicionarArmazens(Mapa& m) {
 }
 
 // Inicializa o loop da musica tema (CARLOS)
-void inicializarAudio(Controle& c) {
+void inicializarAudio(Controle &c) {
 	c.tema = al_create_sample_instance(c.somTema);
 	al_set_sample_instance_playmode(c.tema, ALLEGRO_PLAYMODE_LOOP);
 	al_attach_sample_instance_to_mixer(c.tema, al_get_default_mixer());
 }
 
-// Reinicia as vari·veis (CARLOS)
-void inicializarJogo(Mapa& m, Controle& c, Formiga& f, Item& i) {
+// Reinicia as vari√°veis (CARLOS)
+void inicializarJogo(Mapa &m, Controle &c, Formiga &f, Item &i) {
 	inicializarVariaveis(m, c, f, i);
 	novoMapa(m);
 	posicionarFormiga(m, f);
@@ -962,8 +1305,8 @@ void inicializarJogo(Mapa& m, Controle& c, Formiga& f, Item& i) {
 	posicionarArmazens(m);
 }
 
-// funÁ„o para medir tempo e sortear novo mapa (CARLOS E MATEUS)
-void medirTempo(bool inicio, Mapa& m, Controle& c, Formiga& f, Item& i) {
+// fun√ß√£o para medir tempo e sortear novo mapa (CARLOS E MATEUS)
+void medirTempo(bool inicio, Mapa &m, Controle &c, Formiga &f, Item &i) {
 	if (inicio)
 		c.tempoInicial = clock();
 	else {
@@ -981,3 +1324,66 @@ void medirTempo(bool inicio, Mapa& m, Controle& c, Formiga& f, Item& i) {
 		}
 	}
 }
+
+/*---------------------------------------------------------------------------------------------------*/
+
+// TANTO A FUN√á√ÉO MAIN COMO SUAS VARI√ÅVEIS FORAM MANIPULADAS POR TODO O GRUPO
+//
+int main(void) {
+	/*-------------------------------- VARI√ÅVEIS ------------------------------*/
+
+	Mapa m;
+	Formiga f;
+	Controle c;
+	Item i;
+
+	/*-------------------------------------------------------------------------*/
+
+	/*------------------------------ INICIALIZA√á√ÉO ----------------------------*/
+
+	inicializarAllegro(c);
+	carregarRecursos(m, c, f, i);
+	inicializarJogo(m, c, f, i);
+	inicializarAudio(c);
+
+	/*------------------------------ LOOP PRINCIPAL ---------------------------*/
+
+	while (!c.sair) {
+		al_clear_to_color(al_map_rgb(0, 0, 0));
+		//Inicia o menu do jogo
+		if (c.menu)
+			menu(c);
+		// Inicia o jogo chamando todas as fun√ß√µes
+		else if (c.jogar) {
+			medirTempo(true, m, c, f, i);
+			tempoItem(true, i);
+			lerComandos(m, c, f, i);
+			desenharFrame(m, c, f, i);
+			tempoItem(false, i);
+			medirTempo(false, m, c, f, i);
+		}
+		// Ativa o menu de pausa
+		else if (c.pausa)
+			pausa(m, c, f, i);
+		// Finaliza o jogo ap√≥s vencer
+		if (venceu(m.armazem) && f.vazio)
+			fimJogo(c);
+		if (c.reiniciar)
+			inicializarJogo(m, c, f, i);
+
+		al_set_sample_instance_playing(c.tema, c.musica);
+		if (c.jogar)
+			al_set_sample_instance_gain(c.tema, 0.25);
+		else
+			al_set_sample_instance_gain(c.tema, 1.0);
+
+		al_flip_display();
+	}
+
+	/*-------------------------------------------------------------------------*/
+
+	finalizar(m, c, f, i);
+
+	return 0;
+}
+//
